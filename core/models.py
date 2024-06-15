@@ -3,6 +3,7 @@ from django.db import models
 from os.path import join
 
 #TODO search about Meta class (constraints on foreign keys)
+#TODO search about default= argument
 #TODO comments
 
 class Movie(models.Model):
@@ -24,8 +25,7 @@ class Movie(models.Model):
     
     def __str__(self):
         return f"{self.pk} {self.title} {self.release_date} views: {self.views_total} 
-            reviews: {self.reviews_total}"
-            
+            reviews: {self.reviews_total}"         
             
     
 class Profile(models.Model):
@@ -36,7 +36,7 @@ class Profile(models.Model):
         blank=True)
     bio = models.TextField(blank=True)                      # biography
     stars = models.ManyToManyField(                         # starred reviews
-        Review, 
+        'Review', 
         through='Star', 
         related_name='stars', 
         blank=True)
@@ -70,3 +70,36 @@ class Profile(models.Model):
     
     def __str__(self):
         return f"{self.pk} {self.username}"
+    
+    
+class Review(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    text = models.TextField()
+    date = models.DateTimeField()
+    stars_total = models.PositiveIntegerField()
+
+
+class Star(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+    
+    
+class Log(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    like = models.BooleanField(default=False)
+    just_watched = models.BooleanField(default=False)
+    date = models.DateTimeField(null=True)
+    
+
+class WatchList(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    priority = models.PositiveIntegerField()
+    date = models.DateTimeField()
+    
+    
+class Favourite(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
