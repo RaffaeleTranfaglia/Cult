@@ -1,4 +1,4 @@
-from .models import Profile, Follow
+from .models import Profile, Follow, Favourite
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
@@ -28,7 +28,7 @@ def validate_follows(sender, instance, action, pk_set, **kwargs):
         
         
 # check that the favourite movies count does not exceed the maximum
-@receiver(m2m_changed, sender=Follow)
+@receiver(m2m_changed, sender=Favourite)
 def check_favourites_movies(sender, instance, action, pk_set, **kwargs):
     if action == 'pre_add':
         if instance.favourites.count() + len(pk_set) > 4:

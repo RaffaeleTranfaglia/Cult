@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from os.path import join
+from django.utils import timezone
 
-#TODO search about Meta class (constraints on foreign keys)
-#TODO search about default= argument
 #TODO comments
 
 class Movie(models.Model):
@@ -25,7 +24,10 @@ class Movie(models.Model):
     
     def __str__(self):
         return f"{self.pk} {self.title} {self.release_date} views: {self.views_total} 
-            reviews: {self.reviews_total}"         
+            reviews: {self.reviews_total}"
+            
+    class Meta:
+        ordering = ['release_date']     
             
     
 class Profile(models.Model):
@@ -72,34 +74,91 @@ class Profile(models.Model):
         return f"{self.pk} {self.username}"
     
     
+class Follow(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    follows = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ['profile', 'follows'],
+                name = 'unique_follow'
+            )
+        ]
+    
+    
 class Review(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     text = models.TextField()
-    date = models.DateTimeField()
+    date = models.DateTimeField(default=timezone.now)
     stars_total = models.PositiveIntegerField()
+    
+    class Meta:
+        ordering = ['-date', 'profile']
+        constraints = [
+            models.UniqueConstraint(
+                fields = ['profile', 'movie'],
+                name = 'unique_review'
+            )
+        ]
 
 
 class Star(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     review = models.ForeignKey(Review, on_delete=models.CASCADE)
     
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ['profile', 'review'],
+                name = 'unique_star'
+            )
+        ]
+    
     
 class Log(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     like = models.BooleanField(default=False)
-    just_watched = models.BooleanField(default=False)
-    date = models.DateTimeField(null=True)
+    just_watched = models.BooleanField(default=True)
+    date = models.DateTimeField(null=True, default=timezone.now)
+    
+    class Meta:
+        ordering = ['-date']
+        constraints = [
+            models.UniqueConstraint(
+                fields = ['profile', 'movie'],
+                name = 'unique_log'
+            )
+        ]
     
 
 class WatchList(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     priority = models.PositiveIntegerField()
-    date = models.DateTimeField()
+    date = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        ordering = ['-priority', "-date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields = ['profile', 'movie'],
+                name = 'unique_watchlist'
+            )
+        ]
     
     
 class Favourite(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    
+    class Meta:
+        ordering = ['pk']
+        constraints = [
+            models.UniqueConstraint(
+                fields = ['profile', 'movie'],
+                name = 'unique_favourite'
+            )
+        ]
