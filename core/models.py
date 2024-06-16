@@ -23,7 +23,7 @@ class Movie(models.Model):
     reviews_total = models.PositiveIntegerField()
     
     def __str__(self):
-        return f"{self.pk} {self.title} {self.release_date} views: {self.views_total} 
+        return f"{self.pk} {self.title} {self.release_date} views: {self.views_total} \
             reviews: {self.reviews_total}"
             
     class Meta:
@@ -55,7 +55,7 @@ class Profile(models.Model):
     whatchlist = models.ManyToManyField(                    # watchlisted movies
         Movie, 
         through='WatchList', 
-        related_name='watchlist', 
+        related_name='watchlists', 
         blank=True)
     favourites = models.ManyToManyField(                    # favourites movies
         Movie,
@@ -75,8 +75,8 @@ class Profile(models.Model):
     
     
 class Follow(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    follows = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='+')
+    follows = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='+')
     
     class Meta:
         constraints = [
