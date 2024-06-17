@@ -27,7 +27,7 @@ class Movie(models.Model):
             reviews: {self.reviews_total}"
             
     class Meta:
-        ordering = ['release_date']     
+        ordering = ['-release_date']     
             
     
 class Profile(models.Model):
@@ -121,17 +121,12 @@ class Log(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     like = models.BooleanField(default=False)
+    rewatch = models.BooleanField(default=False)
     just_watched = models.BooleanField(default=True)
     date = models.DateTimeField(null=True, default=timezone.now)
     
     class Meta:
         ordering = ['-date']
-        constraints = [
-            models.UniqueConstraint(
-                fields = ['profile', 'movie'],
-                name = 'unique_log'
-            )
-        ]
     
 
 class WatchList(models.Model):
