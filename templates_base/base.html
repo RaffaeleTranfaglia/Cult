@@ -30,12 +30,22 @@
     
             <!-- Profile picture or login on the right -->
             <div class="ml-auto">
-                <!-- If the user is authenticated, show profile picture -->
-                <a class="nav-link" href="#">
-                    <img src="path_to_profile_picture.jpg" alt="Profile" class="rounded-circle" width="30" height="30">
+                <a class="navbar-link" href="
+                {% if user.is_authenticated %}
+                    {% url 'core:profile' %}
+                {% else %}
+                    {% url 'core:login' %}
+                {% endif %}
+                ">
+                {% if user.is_authenticated %}
+                    <img style="width:48px;height:48px" alt="propic-thumbnail" 
+                    class="object-fit-fill rounded-circle img-thumbnail" 
+                    src="{{ user.profile.propic }}">
+                    {{user.username}}
+                {% else %}
+                    Login
+                {% endif %}
                 </a>
-                <!-- If the user is not authenticated, show login link -->
-                <!-- <a class="nav-link" href="#">Login</a> -->
             </div>
         </div>
     </nav>

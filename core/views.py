@@ -1,6 +1,6 @@
 from typing import Any
 from django.shortcuts import render
-from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from .models import Movie, Profile
 
 def home_view(request):
@@ -26,5 +26,15 @@ def home_view(request):
                 # friend's last movie logged (logs db is ordered by date in descending order)
                 logs.append(friend.logs.all()[0])
             context['friends_movies'] = sorted(logs, key=lambda x : x.date, reverse=True)[:10]
+            
+    #TODO insert recommended movies
     
     return render(request, template_name='home.html', context=context)
+
+class MovieDetail(DetailView):
+    model = Movie
+    template_name = 'movie_page.html'
+    
+class ProfileDetail(DetailView):
+    model = Profile
+    template_name = 'profile_page.html'

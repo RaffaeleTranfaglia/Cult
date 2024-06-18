@@ -19,8 +19,8 @@ class Movie(models.Model):
     runtime = models.DurationField()
     release_date = models.DateField()
     production = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='production')
-    views_total = models.PositiveIntegerField()
-    reviews_total = models.PositiveIntegerField()
+    views_total = models.PositiveIntegerField(default=0)
+    reviews_total = models.PositiveIntegerField(default=0)
     
     def __str__(self):
         return f"{self.pk} {self.title} {self.release_date} views: {self.views_total} \
@@ -92,7 +92,7 @@ class Review(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     text = models.TextField()
     date = models.DateTimeField(default=timezone.now)
-    stars_total = models.PositiveIntegerField()
+    stars_total = models.PositiveIntegerField(default=0)
     
     class Meta:
         ordering = ['-date', 'profile']
