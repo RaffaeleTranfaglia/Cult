@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Cult | Create Movie{% endblock %}
+
+{% block header %} Create Movie {% endblock %}
+
+{% block content %}
+
+<form method="post"> {% csrf_token %}
+    {{form | crispy}}
+    <input type="submit" class="btn btn-success" value="Register"> 
+</form>
+
+{% endblock %}

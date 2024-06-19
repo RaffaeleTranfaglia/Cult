@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Cult | Delete Movie{% endblock %}
+
+{% block header %} Delete Movie {% endblock %}
+
+{% block content %} 
+
+<h1>Delete Movie</h1>
+<p>Are you sure you want to delete "{{ object.title }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'core:home' %}">Cancel</a>
+</form>
+
+{% endblock %}

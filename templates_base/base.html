@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {% block head %} {% endblock %}
-
-    <title> {% block title %}Cult | {{pagename}}{% endblock %}</title>
+    <title> {% block title %}{% endblock %}</title>
 
     {% block head %} {% endblock %}
 
@@ -24,7 +22,7 @@
             <!-- Page name in the center -->
             <div class="mx-auto">
                 <span class="navbar-text">
-                    {{pagename}}
+                    {% block header %} {% endblock %}
                 </span>
             </div>
     
