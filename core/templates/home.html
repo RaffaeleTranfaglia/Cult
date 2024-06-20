@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Cult | Homepage{% endblock %}
+
+{% block header %} Homepage {% endblock %}
+
+{% block content %}
+
+<h1>Popular Movies</h1>
+<div class="row mb-4">
+    {% for movie in popular_movies %}
+        <div class="col-md-3">
+            <div class="card">
+                <a href="{% url 'movie_page' movie.pk %}">
+                    <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">{{ movie.title }}</h5>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<h1>Latest Releases</h1>
+<div class="row mb-4">
+    {% for movie in recent_movies %}
+        <div class="col-md-3">
+            <div class="card">
+                <a href="{% url 'movie_page' movie.pk %}">
+                    <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">{{ movie.title }}</h5>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% if request.user.is_authenticated and friends_movie != None %}
+    <h1>Movies Watched by Friends</h1>
+    <div class="row">
+        {% for log in friends_movies %}
+            <div class="col-md-3">
+                <div class="card">
+                    <a href="{% url 'movie_page' log.movie.pk %}">
+                        <img src="{{ log.movie.poster.url }}" class="card-img-top" alt="{{ log.movie.title }}">
+                    </a>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ log.profile.propic.url }}" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                            <span>{{ log.profile.user.username }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}

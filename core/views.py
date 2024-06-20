@@ -19,18 +19,19 @@ def home_view(request):
     context = { 
         'popular_movies': popular_movies, 
         'recent_movies': recent_movies, 
-        'friends_movies': None
     }
 
     if request.user.is_authenticated:
-        user_profile = Profile.objects.get(user=request.user)
-        if user_profile:
+        try:
+            user_profile = Profile.objects.get(user=request.user)
             logs = []
             following_profiles = user_profile.follows.all()
             for friend in following_profiles:
                 # friend's last movie logged (logs db is ordered by date in descending order)
                 logs.append(friend.logs.all()[0])
             context['friends_movies'] = sorted(logs, key=lambda x : x.date, reverse=True)[:10]
+        except Profile.DoesNotExist:
+            context['friends_movies'] = None
             
     #TODO insert recommended movies
     

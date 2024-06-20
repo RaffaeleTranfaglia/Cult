@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
+{% load static %}
 
 <head>
     <meta charset="UTF-8">
@@ -10,40 +11,73 @@
     {% block head %} {% endblock %}
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        .content {
+            min-height: 100%; /* Fallback for older browsers */
+            display: flex;
+            flex-direction: column;
+        }
+        .main {
+            flex: 1; /* This makes the main content area grow to fill available space */
+        }
+        footer {
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <!-- Home link on the left -->
+        <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'core:home' %}">Cult</a>
-    
-            <!-- Page name in the center -->
-            <div class="mx-auto">
-                <span class="navbar-text">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:home' %}">
+                            <img src="{% static 'search.svg' %}" alt="" width="20" height="20">
+                        </a>
+                    </li>
+                </ul>
+                <span class="navbar-text mx-auto">
                     {% block header %} {% endblock %}
                 </span>
-            </div>
-    
-            <!-- Profile picture or login on the right -->
-            <div class="ml-auto">
-                <a class="navbar-link" href="
-                {% if user.is_authenticated %}
-                    {% url 'core:profile' %}
-                {% else %}
-                    {% url 'core:login' %}
-                {% endif %}
-                ">
-                {% if user.is_authenticated %}
-                    <img style="width:48px;height:48px" alt="propic-thumbnail" 
-                    class="object-fit-fill rounded-circle img-thumbnail" 
-                    src="{{ user.profile.propic }}">
-                    {{user.username}}
-                {% else %}
-                    Login
-                {% endif %}
-                </a>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="navbar-link" href="
+                            {% if user.is_superuser or user.is_staff %}
+                                admin/
+                            {% elif user.is_authenticated %}
+                                {% url 'core:profile_page' request.user.pk %}
+                            {% else %}
+                                {% url 'core:login' %}
+                            {% endif %}
+                            ">
+                            {% if user.is_authenticated %}
+                                <img style="width:48px;height:48px" 
+                                class="object-fit-fill rounded-circle img-thumbnail" 
+                                src="
+                                {% if user.is_superuser %}
+                                    {% static 'admin.svg' %}
+                                {% elif user.is_staff %}
+                                    {% static 'staff.svg' %}
+                                {% else %}
+                                    {{ user.profile.propic }}
+                                {% endif %}
+                                 ">
+                                {{user.username}}
+                            {% else %}
+                                Login
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -54,5 +88,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
+
+<footer>
+    {% block footer %} {% endblock %}
+</footer>
 
 </html>
