@@ -54,7 +54,7 @@
                             {% if user.is_superuser or user.is_staff %}
                                 admin/
                             {% elif user.is_authenticated %}
-                                {% url 'core:profile_page' request.user.pk %}
+                                {% url 'core:profile_page' request.user.profile.pk %}
                             {% else %}
                                 {% url 'core:login' %}
                             {% endif %}
@@ -68,7 +68,7 @@
                                 {% elif user.is_staff %}
                                     {% static 'staff.svg' %}
                                 {% else %}
-                                    {{ user.profile.propic }}
+                                    {{ user.profile.propic.url }}
                                 {% endif %}
                                  ">
                                 {{user.username}}

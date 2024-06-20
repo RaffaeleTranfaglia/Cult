@@ -71,7 +71,7 @@ class Profile(models.Model):
         blank=True)
     
     def __str__(self):
-        return f"{self.pk} {self.username}"
+        return f"{self.pk} {self.user.username}"
     
     
 class Follow(models.Model):
