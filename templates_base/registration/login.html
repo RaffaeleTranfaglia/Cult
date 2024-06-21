@@ -24,14 +24,10 @@
             {{form | crispy}}
             <input type="submit" class="btn btn-success" value="Login">
         </form>
+        <span>
+          <a class="btn btn-info mt-4" href="{% url 'core:register' %}" role="button">Register</a>
+        </span>
     </div>
 </div>
-
-
-{% endblock %}
-
-{% block footer %}
-
-<a class="btn btn-info" href="{% url 'core:register' %}" role="button">Register</a>
 
 {% endblock %}

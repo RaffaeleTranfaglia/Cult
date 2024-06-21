@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Cult | Movies list{% endblock %}
+
+{% block header %} 
+    {{user.username}}'s movies
+{% endblock %}
+
+{% block content %}
+
+{% if request.GET['reason'] == 'production' %}
+    <h1>Movies produced by {{user.username}}</h1>
+{% elif request.GET['reason'] == 'diary' %}
+    <h1>Movies watched by {{user.username}}</h1>
+{% endif %}
+
+<!-- Use movie cards, and divide them in 4 rows -->
+<ul>
+    {% for movie in movies %}
+        <li>{{ movie.title }} ({{ movie.release_date }})</li>
+    {% empty %}
+        <li>No movies watched yet.</li>
+    {% endfor %}
+</ul>
+
+<!-- Pagination controls -->
+<div class="pagination">
+    <span class="step-links">
+        {% if movies.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ movies.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ movies.number }} of {{ movies.paginator.num_pages }}.
+        </span>
+
+        {% if movies.has_next %}
+            <a href="?page={{ movies.next_page_number }}">next</a>
+            <a href="?page={{ movies.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}

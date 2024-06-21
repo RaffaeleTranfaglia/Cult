@@ -4,20 +4,26 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from os.path import join
+from django.contrib.auth.models import Group
 
 # checks on the creation of new profiles and their update
 @receiver(post_save, sender=get_user_model())
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     # Exclude the staff users and the 'admin' users
+    base_group = Group.objects.get(name='base')
+    business_group = Group.objects.get(name='business')
     if instance.is_staff or instance.is_superuser:
         try:
             profile = Profile.objects.get(user=instance)
             profile.delete()
+            base_group.user_set.delete(instance)
+            business_group.user_set.delete(instance)
             return
         except Profile.DoesNotExist:
             return
     if created:
         Profile.objects.create(user=instance)
+        base_group.user_set.add(instance)
 
 
 @receiver(post_save, sender=get_user_model())
