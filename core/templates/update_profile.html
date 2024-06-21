@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %} 
+
+{% block title %}Cult | Update profile{% endblock %}
+
+{% block header %} Update profile {% endblock %}
+
+{% block content %}
+
+<div class="centered-form">
+    <div class="form-container">
+        <h2>Modify</h2>
+        <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+            {{form | crispy}}
+            <input type="submit" class="btn btn-success" value="Save Changes"> 
+        </form>
+    </div>
+</div>
+
+{% endblock %}

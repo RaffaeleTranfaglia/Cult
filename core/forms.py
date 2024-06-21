@@ -1,5 +1,5 @@
 from django import forms
-from .models import Movie
+from .models import Movie, Profile
 
 class CreateMovieForm(forms.ModelForm):
     description = "Publish a new Movie"
@@ -17,3 +17,9 @@ class CreateMovieForm(forms.ModelForm):
             self.fields['production'] = profile
         except:
             self.add_error('production', 'Error on profile')
+            
+            
+class UpdateProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['propic', 'bio']

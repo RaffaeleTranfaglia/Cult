@@ -5,9 +5,11 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Movie, Profile
-from .forms import CreateMovieForm
+from .forms import CreateMovieForm, UpdateProfileForm
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 def home_view(request):
     # 10 most popular (viewed) movies
@@ -87,6 +89,7 @@ class MovieDeleteView(GroupRequiredMixin, DeleteView):
             messages.error(request, "You do not have permission to delete this movie.")
             # TODO add a temporary banner that confirms the action
             return redirect('core:home')
+        return super().dispatch(request, *args, **kwargs)
     
     def get_success_url(self):
         # TODO add a temporary banner that confirms the action
@@ -97,8 +100,23 @@ class UserCreationView(CreateView):
     form_class = UserCreationForm
     template_name = 'user_create.html'
     success_url = reverse_lazy('login')
-    
+
 
 class ProfileDetailView(DetailView):
     model = Profile
     template_name = 'profile_page.html'
+    
+
+@login_required
+def update_profile_view(request, pk):
+    if pk != str(request.user.profile.pk):
+        # TODO add a temporary banner that confirms the action
+        return redirect('core:home')
+    if request.method == 'POST':
+        form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('core:profile_page', kwargs={'pk' : request.user.profile.pk}))
+    else:
+        form = UpdateProfileForm(instance=request.user.profile)
+    return render(request, 'update_profile.html', {'form': form})

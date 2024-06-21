@@ -1,7 +1,82 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Cult{% endblock %}
+{% block title %}Cult | Profile{% endblock %}
 
-{% block header %} {% endblock %}
+{% block header %} Profile {% endblock %}
 
-{% block content %} Hello world {% endblock %}
+{% block content %}
+
+<div class="container">
+    {% if object.pk == user.profile.pk %}
+        <div style="position: absolute; top: 80px; right: 20px;">
+            <a class="nav-link" href="{% url 'core:logout' %}">
+                <img src="{% static 'logout.svg' %}" alt="" width="25" height="25">
+            </a>
+        </div>
+        <div style="position: absolute; top: 80px; right: 65px;">
+            <a class="nav-link" href="{% url 'core:update_profile' user.profile.pk %}">
+                <img src="{% static 'update_profile.svg' %}" alt="" width="25" height="25">
+            </a>
+        </div>
+    {% endif %}
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6 text-center mt-5">
+            <!-- Profile Picture -->
+            <img src="{{ user.profile.propic.url }}" class="rounded-circle" width="125" height="125">
+            <!-- Username -->
+            <h2 class="mt-3">{{ user.username }}</h2>
+            <!-- Bio -->
+            <p class="mt-2">{{ user.profile.bio }}</p>
+            <!-- Favourite Movies -->
+            {% if user.profile.favourites.all > 0 %}
+                <h3 class="mt-4">Favourites</h3>
+                <div class="row">
+                    {% for favourite in user.profile.favourites.all %}
+                        <div class="col-md-3">
+                            <div class="card">
+                                <a href="{% url 'movie_page' favourite.movie.pk %}">
+                                    <img src="{{ favourite.movie.poster.url }}" class="card-img-top" 
+                                    alt="{{ favourite.movie.title }}">
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <!-- Recent Logs -->
+            {% if user.profile.logs.all > 0 %}
+                <h3 class="mt-4">Recent activities</h3>
+                <div class="row">
+                    {% for log in user.profile.logs.all|slice:":4" %}
+                        <div class="col-md-3">
+                            <div class="card">
+                                <a href="{% url 'movie_page' log.movie.pk %}">
+                                    <img src="{{ log.movie.poster.url }}" class="card-img-top" 
+                                    alt="{{ log.movie.title }}">
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    {% if log.like %}
+                                        <img src="{% static 'like.svg' %}" style="width: 12px; height: 12px;">
+                                    {% endif %}
+                                    {% if log.rewatch %}
+                                        <span>
+                                            <img src="{% static 'rewatch.svg' %}" style="width: 12px; height: 12px;">
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

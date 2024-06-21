@@ -20,8 +20,22 @@
             display: flex;
             flex-direction: column;
         }
-        .main {
-            flex: 1; /* This makes the main content area grow to fill available space */
+        .navbar {
+            width: 100%;
+            height: 60px; /* Set your navbar height here */
+        }
+        .centered-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 60px); /* Full viewport height minus navbar height*/
+        }
+        .form-container {
+            width: 600px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
         footer {
             background-color: #f8f9fa;
@@ -60,7 +74,7 @@
                             {% endif %}
                             ">
                             {% if user.is_authenticated %}
-                                <img style="width:48px;height:48px" 
+                                <img style="width:45px;height:45px" 
                                 class="object-fit-fill rounded-circle img-thumbnail" 
                                 src="
                                 {% if user.is_superuser %}

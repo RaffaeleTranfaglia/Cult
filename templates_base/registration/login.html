@@ -13,23 +13,25 @@
 
 {% if "notok" in request.GET.auth %}
 <div class="alert alert-danger" role="alert">
-    You arrived here because you do not have the necessary permits for your chosen service!
+  You arrived here because you do not have the necessary permits for your chosen service!
 </div>
 {% endif %}
 
-<form method="post"> {% csrf_token %}
+<div class="centered-form">
+    <div class="form-container">
+        <h2>Modify</h2>
+        <form method="post"> {% csrf_token %}
+            {{form | crispy}}
+            <input type="submit" class="btn btn-success" value="Login">
+        </form>
+    </div>
+</div>
 
-  {{form | crispy}}
-  
-  <input type="submit" class="btn btn-success" value="Login">
-  
-</form>
 
 {% endblock %}
 
 {% block footer %}
 
 <a class="btn btn-info" href="{% url 'core:register' %}" role="button">Register</a>
-<a class="btn btn-info" href="/admin/" role="button">Staff Login</a>
 
 {% endblock %}
