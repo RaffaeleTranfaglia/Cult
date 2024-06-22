@@ -6,12 +6,16 @@
 
 {% block content %} 
 
-<h1>Delete Movie</h1>
-<p>Are you sure you want to delete "{{ object.title }}"?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, delete</button>
-    <a href="{% url 'core:home' %}">Cancel</a>
-</form>
+<div class="centered-form">
+    <div class="form-container">
+        <h2>Delete</h2>
+        <p>Are you sure you want to delete "{{ object.title }}"?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Yes, delete</button>
+            <a href="{% url 'core:home' %}">Cancel</a>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

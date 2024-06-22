@@ -7,7 +7,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
-from .models import Movie, Profile
+from .models import Movie, Profile, Log
 from .forms import CreateMovieForm, UpdateProfileForm
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
@@ -49,7 +49,7 @@ class MovieCreateView(GroupRequiredMixin, CreateView):
     template_name = 'create_movie.html'
     
     def form_valid(self, form):
-        form.instance.productions = self.request.profile
+        form.instance.production = self.request.user.profile
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -75,11 +75,7 @@ class MovieListView(ListView):
 class MovieDetailView(DetailView):
     model = Movie
     template_name = 'movie_page.html'
-    
-    def get_context_data(self, **kwargs):
-        context =  super().get_context_data(**kwargs)
-        context['pagename'] = self.object.title
-        return context
+    context_object_name = 'movie'
     
 
 class MovieUpdateView(GroupRequiredMixin, UpdateView):
@@ -139,8 +135,17 @@ def update_profile_view(request, pk):
     return render(request, 'update_profile.html', {'form': form})
 
 
-class DiaryList(MovieListView):
+class DiaryList(ListView):
+    model = Log
+    template_name = 'diary_list.html'
+    context_object_name = 'logs'
+    paginate_by = 30
+    
     def get_queryset(self):
         profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
-        logs = profile.logs.all()
-        return [log.movie for log in logs]
+        return profile.logs.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        return context

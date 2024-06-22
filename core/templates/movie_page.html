@@ -1,7 +1,51 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Cult{% endblock %}
+{% block title %}Cult | Movie page{% endblock %}
 
-{% block header %} {% endblock %}
+{% block header %} {{move.title}} {% endblock %}
 
-{% block content %} Hello world {% endblock %}
+{% block content %}
+
+{% if movie.production.pk == user.prfile.pk %}
+    <div style="position: absolute; top: 80px; right: 20px;">
+        <a class="nav-link" href="{% url 'core:update_movie' movie.pk %}">
+            <img src="{% static 'update.svg' %}" alt="" width="25" height="25">
+        </a>
+    </div>
+{% endif %}
+
+<div class="container">
+    <div class="row h-100">
+        <div class="col-md-4">
+            <img src="{{ movie.poster.url }}" class="img-fluid poster" alt="{{ movie.title }}">
+        </div>
+        <div class="col-md-8">
+            <h1>{{ movie.title }}</h1>
+            <p><strong>Plot:</strong> {{ movie.plot }}</p>
+            <p><strong>Genres:</strong> {{ movie.genres }}</p>
+            <p><strong>Directed by:</strong> {{ movie.director }}</p>
+            <p><strong>Cast:</strong> {{ movie.cast }}</p>
+            <p><strong>Runtime:</strong> {{ movie.runtime }}</p>
+            <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+            <p><strong>Production:</strong> 
+                <a href="{% url 'core:profile_page' movie.production.pk %}">
+                    {{ movie.production.user.username }}
+                </a>
+            </p>
+            <p><strong>Total Views:</strong> {{ movie.views_total }}</p>
+            <p><strong>Total Reviews:</strong> {{ movie.reviews_total }}</p>
+
+            <!-- Buttons -->
+            <div class="btn-group mt-4" role="group" aria-label="Movie Actions">
+                <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-primary">Log Movie</a>
+                {% if user.profile in movie.logs.profile.all %}
+                    <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-secondary">Review Movie</a>
+                {% endif %}
+                <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-warning">Add to Watchlist</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

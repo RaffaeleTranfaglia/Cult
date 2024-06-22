@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Cult | Movies list{% endblock %}
+{% block title %}Cult | Diary list{% endblock %}
 
 {% block header %} 
     {{profile.user.username}}'s movies
@@ -8,17 +8,26 @@
 
 {% block content %}
 
-<h1>Movies produced by {{profile.user.username}}</h1>
+<h1>Movies watched by {{profile.user.username}}</h1>
 
 <ul>
-    {% for movie in movies %}
+    {% for log in logs %}
         <div class="col-md-3 mb-4">
             <div class="card">
-                <a href="{% url 'movie_page' movie.pk %}">
-                    <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                <a href="{% url 'movie_page' log.movie.pk %}">
+                    <img src="{{ log.movie.poster.url }}" class="card-img-top" alt="{{ log.movie.title }}">
                 </a>
                 <div class="card-body">
-                    <h5 class="card-title">{{ movie.title }}</h5>
+                    <div class="d-flex align-items-center">
+                        {% if log.like %}
+                            <img src="{% static 'like.svg' %}" style="width: 12px; height: 12px;">
+                        {% endif %}
+                        {% if log.rewatch %}
+                            <span>
+                                <img src="{% static 'rewatch.svg' %}" style="width: 12px; height: 12px;">
+                            </span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -26,7 +35,7 @@
             </div><div class="row">
         {% endif %}
     {% empty %}
-        <li>No movies produced yet.</li>
+        <li>No movies watched yet.</li>
     {% endfor %}
 </ul>
 

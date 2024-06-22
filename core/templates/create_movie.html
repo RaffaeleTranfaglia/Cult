@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Cult | Publish movie{% endblock %}
+
+{% block header %} Publish a new movie {% endblock %}
+
+{% block content %}
+
+<div style="margin-top: 170px;">
+    <div class="centered-form">
+        <div class="form-container">
+            <h2>Add a movie</h2>
+            <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                {{form | crispy}}
+                <input type="submit" class="btn btn-success" value="Publish"> 
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
