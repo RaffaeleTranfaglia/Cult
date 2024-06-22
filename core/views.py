@@ -84,6 +84,16 @@ class MovieUpdateView(GroupRequiredMixin, UpdateView):
     template_name = 'update_movie.html'
     fields = ['title', 'poster', 'plot', 'genres', 'director', 'cast', 'runtime']
     
+    def dispatch(self, request, *args, **kwargs):
+        movie = self.get_object()
+        user_profile = request.user.profile
+
+        if movie.production != user_profile:
+            messages.error(request, "You do not have permission to modify this movie.")
+            # TODO add a temporary banner that confirms the action
+            return redirect('core:home')
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_success_url(self):
         # TODO add a temporary banner that confirms the action
         return reverse('core:movie_page', kwargs={'pk' : self.object.pk})

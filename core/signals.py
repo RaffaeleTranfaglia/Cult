@@ -1,4 +1,4 @@
-from .models import Profile, Follow, Favourite
+from .models import Profile, Follow, Favourite, Movie
 from django.db.models.signals import post_save, m2m_changed, pre_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
@@ -36,7 +36,13 @@ def save_user_profile(sender, instance, **kwargs):
 @receiver(pre_save, sender=Profile)
 def check_propic(sender, instance, **kwargs):
         if not instance.propic:
-            instance.propic = default=join('static', 'default_propic.svg')
+            instance.propic = join('static', 'default_propic.svg')
+            
+
+@receiver(pre_save, sender=Movie)
+def check_poster(sender, instance, **kwargs):
+    if not instance.poster:
+        instance.poster = join('static', 'default_movie_poster.svg')
         
         
 # check that a profile does not follows itself

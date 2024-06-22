@@ -7,20 +7,12 @@
 
 {% block content %}
 
-{% if movie.production.pk == user.prfile.pk %}
-    <div style="position: absolute; top: 80px; right: 20px;">
-        <a class="nav-link" href="{% url 'core:update_movie' movie.pk %}">
-            <img src="{% static 'update.svg' %}" alt="" width="25" height="25">
-        </a>
-    </div>
-{% endif %}
-
 <div class="container">
     <div class="row h-100">
-        <div class="col-md-4">
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
             <img src="{{ movie.poster.url }}" class="img-fluid poster" alt="{{ movie.title }}">
         </div>
-        <div class="col-md-8">
+        <div class="col-md-6 mt-5">
             <h1>{{ movie.title }}</h1>
             <p><strong>Plot:</strong> {{ movie.plot }}</p>
             <p><strong>Genres:</strong> {{ movie.genres }}</p>
@@ -38,12 +30,22 @@
 
             <!-- Buttons -->
             <div class="btn-group mt-4" role="group" aria-label="Movie Actions">
-                <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-primary">Log Movie</a>
+                <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-primary">Log Movie</a>
                 {% if user.profile in movie.logs.profile.all %}
-                    <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-secondary">Review Movie</a>
+                    <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-secondary">Review Movie</a>
                 {% endif %}
-                <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-warning">Add to Watchlist</a>
+                <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-warning">Add to Watchlist</a>
             </div>
+            {% if movie.production.pk == user.profile.pk %}
+                <div class="row mt-4">
+                    <a class="nav-link" href="{% url 'core:update_movie' movie.pk %}">
+                        <img src="{% static 'update.svg' %}" alt="" width="25" height="25">
+                    </a>
+                    <a class="nav-link" href="{% url 'core:delete_movie' movie.pk %}">
+                        <img src="{% static 'delete.svg' %}" alt="" width="25" height="25">
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
