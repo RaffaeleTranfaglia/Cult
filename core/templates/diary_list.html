@@ -10,9 +10,9 @@
 
 <h1>Movies watched by {{profile.user.username}}</h1>
 
-<ul>
+<div class="row">
     {% for log in logs %}
-        <div class="col-md-3 mb-4">
+        <div class="col-md-2 mb-4">
             <div class="card">
                 <a href="{% url 'movie_page' log.movie.pk %}">
                     <img src="{{ log.movie.poster.url }}" class="card-img-top" alt="{{ log.movie.title }}">
@@ -31,31 +31,41 @@
                 </div>
             </div>
         </div>
-        {% if forloop.counter|divisibleby:4 and not forloop.last %}
+        {% if forloop.counter|divisibleby:6 and not forloop.last %}
             </div><div class="row">
         {% endif %}
     {% empty %}
         <li>No movies watched yet.</li>
     {% endfor %}
-</ul>
+</div>
 
 <!-- Pagination controls -->
-<div class="pagination">
-    <span class="step-links">
-        {% if movies.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ movies.previous_page_number }}">previous</a>
-        {% endif %}
+<div class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                <span aria-hidden="true">&lsaquo;</span>
+            </a>
+        </li>
+    {% endif %}
 
-        <span class="current">
-            Page {{ movies.number }} of {{ movies.paginator.num_pages }}.
-        </span>
-
-        {% if movies.has_next %}
-            <a href="?page={{ movies.next_page_number }}">next</a>
-            <a href="?page={{ movies.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
+    {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                <span aria-hidden="true">&rsaquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    {% endif %}
 </div>
 
 {% endblock %}

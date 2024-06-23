@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Cult | Movie search{% endblock %}
+
+{% block header %} Movie search {% endblock %}
+
+{% block content %}
+
+<form method="get" action="{% url 'core:movie_search' %}">
+    {{ form.as_p }}
+    <button type="submit">Search</button>
+</form>
+
+{% if results %}
+    <div class="row">
+        {% for movie in results %}
+            <div class="col-md-2 mb-3">
+                <div class="card">
+                    <a href="{% url 'core:movie_page' movie.pk %}">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                    </a>
+                </div>
+            </div>
+            {% if forloop.counter|divisibleby:6 and not forloop.last %}
+                </div><div class="row">
+            {% endif %}
+        {% empty %}
+            <li>Nothing has been found.</li>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                    <span aria-hidden="true">&lsaquo;</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                    <span aria-hidden="true">&rsaquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

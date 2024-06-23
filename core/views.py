@@ -1,24 +1,24 @@
-from typing import Any
-from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
 from .models import Movie, Profile, Log
-from .forms import CreateMovieForm, UpdateProfileForm
+from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 def home_view(request):
-    # 10 most popular (viewed) movies
-    popular_movies = Movie.objects.all().order_by('-views_total')[:10]
+    # 6 most popular (viewed) movies
+    popular_movies = Movie.objects.all().order_by('-views_total')[:6]
     
-    # last 10 published movies (movies db is ordered by release date in descending order)
-    recent_movies = Movie.objects.all()[:10]
+    # last 6 published movies
+    today = timezone.now().date()
+    recent_movies = Movie.objects.filter(release_date__lte=today).order_by('-release_date')[:6]
     
     context = { 
         'popular_movies': popular_movies, 
@@ -33,7 +33,7 @@ def home_view(request):
             for friend in following_profiles:
                 # friend's last movie logged (logs db is ordered by date in descending order)
                 logs.append(friend.logs.all()[0])
-            context['friends_movies'] = sorted(logs, key=lambda x : x.date, reverse=True)[:10]
+            context['friends_movies'] = sorted(logs, key=lambda x : x.date, reverse=True)[:6]
         except Profile.DoesNotExist:
             context['friends_movies'] = None
             
@@ -61,7 +61,7 @@ class MovieListView(ListView):
     model = Movie
     template_name = 'movies_list.html'
     context_object_name = 'movies'
-    paginate_by = 30
+    paginate_by = 12
     
     def get_queryset(self):
         profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
@@ -76,6 +76,9 @@ class MovieDetailView(DetailView):
     model = Movie
     template_name = 'movie_page.html'
     context_object_name = 'movie'
+    
+    def is_available(self):
+        return self.get_object().release_date <= timezone.now().date()
     
 
 class MovieUpdateView(GroupRequiredMixin, UpdateView):
@@ -117,6 +120,24 @@ class MovieDeleteView(GroupRequiredMixin, DeleteView):
     def get_success_url(self):
         # TODO add a temporary banner that confirms the action
         return reverse('core:home')
+    
+    
+class MovieSearchView(FormView):
+    template_name = 'movie_search.html'
+    form_class = MovieSearchForm
+    success_url = reverse_lazy('core:movie_search')
+    paginate_by = 12
+    
+    def form_valid(self, form):
+        field = form.cleaned_data['field']
+        query = form.cleaned_data['query']
+        print(f"Searching for {query} in field {field}")
+        filter_args = {f"{field}__icontains": query}
+        results = Movie.objects.filter(**filter_args)
+        return self.render_to_response(self.get_context_data(form=form, results=results))
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form, results=None))
 
 
 class UserCreationView(CreateView):
@@ -149,7 +170,7 @@ class DiaryList(ListView):
     model = Log
     template_name = 'diary_list.html'
     context_object_name = 'logs'
-    paginate_by = 30
+    paginate_by = 12
     
     def get_queryset(self):
         profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])

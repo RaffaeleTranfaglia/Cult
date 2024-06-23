@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-{% load static %}
+{% load static user_groups %}
 
 <head>
     <meta charset="UTF-8">
@@ -43,6 +43,7 @@
             overflow: hidden;
         }
         .poster {
+            height: calc(100vh - 70px);
             max-height: 100%;
             object-fit: cover;
         }
@@ -54,19 +55,21 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'core:home' %}">Cult</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:home' %}">Search</a>
+                        <a class="nav-link" href="{% url 'core:movie_search' %}">Search</a>
                     </li>
                 </ul>
                 <span class="navbar-text mx-auto">
                     {% block header %} {% endblock %}
                 </span>
                 <ul class="navbar-nav ms-auto">
+                    {% if request.user|in_group:"business" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:production' user.profile.pk %}">My Movies</a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="navbar-link" href="
                             {% if user.is_superuser or user.is_staff %}

@@ -16,3 +16,15 @@ class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['propic', 'bio']
+        
+
+class MovieSearchForm(forms.Form):
+    SEARCH_FIELDS = [
+        ('title', 'Title'),
+        ('genres', 'Genres'),
+        ('director', 'Director'),
+        ('cast', 'Cast')
+    ]
+
+    field = forms.ChoiceField(choices=SEARCH_FIELDS, required=True)
+    query = forms.CharField(max_length=255, required=True)
