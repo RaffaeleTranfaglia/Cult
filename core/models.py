@@ -132,11 +132,10 @@ class Log(models.Model):
 class WatchList(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    priority = models.PositiveIntegerField()
     date = models.DateTimeField(default=timezone.now)
     
     class Meta:
-        ordering = ['-priority', "-date"]
+        ordering = ["-date"]
         constraints = [
             models.UniqueConstraint(
                 fields = ['profile', 'movie'],
