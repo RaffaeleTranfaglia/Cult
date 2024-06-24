@@ -8,6 +8,11 @@
 {% block content %}
 
 <div class="container">
+    <div style="position: absolute; top: 80px; left: 20px; z-index: 10;">
+        <a href="javascript:history.back()">
+            <img src="{% static 'back.svg' %}" alt="" width="18" height="18">
+        </a>
+    </div>
     {% if object.pk == user.profile.pk %}
         <div style="position: absolute; top: 80px; right: 20px;">
             <a class="nav-link" href="{% url 'core:logout' %}">

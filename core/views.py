@@ -122,22 +122,19 @@ class MovieDeleteView(GroupRequiredMixin, DeleteView):
         return reverse('core:home')
     
     
-class MovieSearchView(FormView):
-    template_name = 'movie_search.html'
-    form_class = MovieSearchForm
-    success_url = reverse_lazy('core:movie_search')
-    paginate_by = 12
-    
-    def form_valid(self, form):
-        field = form.cleaned_data['field']
-        query = form.cleaned_data['query']
-        print(f"Searching for {query} in field {field}")
-        filter_args = {f"{field}__icontains": query}
-        results = Movie.objects.filter(**filter_args)
-        return self.render_to_response(self.get_context_data(form=form, results=results))
+def movie_search(request):
+    form = MovieSearchForm()
+    results = Movie.objects.all()
 
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form, results=None))
+    if request.method == 'GET' and 'field' in request.GET:
+        form = MovieSearchForm(request.GET)
+        if form.is_valid():
+            field = form.cleaned_data['field']
+            query = form.cleaned_data['query']
+            filter_args = {f"{field}__icontains": query}
+            results = Movie.objects.filter(**filter_args)
+
+    return render(request, 'movie_search.html', {'form': form, 'results': results})
 
 
 class UserCreationView(CreateView):

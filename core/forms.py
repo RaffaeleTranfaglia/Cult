@@ -26,5 +26,12 @@ class MovieSearchForm(forms.Form):
         ('cast', 'Cast')
     ]
 
-    field = forms.ChoiceField(choices=SEARCH_FIELDS, required=True)
-    query = forms.CharField(max_length=255, required=True)
+    field = forms.ChoiceField(choices=SEARCH_FIELDS, required=True, 
+                              widget=forms.Select(attrs={'class': 'form-select'}))
+    query = forms.CharField(max_length=255, required=True, 
+                            widget=forms.TextInput(attrs={
+                                'class': 'from-control',
+                                'type': 'search',
+                                'placeholder': 'Search',
+                                'aria-label': 'Search'
+                            }))

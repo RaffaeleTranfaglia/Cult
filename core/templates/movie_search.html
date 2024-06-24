@@ -1,15 +1,23 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags static %} 
 
 {% block title %}Cult | Movie search{% endblock %}
 
 {% block header %} Movie search {% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/back_to_top_button_style.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<form method="get" action="{% url 'core:movie_search' %}">
-    {{ form.as_p }}
-    <button type="submit">Search</button>
-</form>
+<div class="row justify-content-center mt-3 mb-3">
+    <form method="get" action="{% url 'core:movie_search' %}" class="row">
+        {{ form.field }}
+        {{ form.query }}
+        <input type="submit" class="btn btn-outline-success" value="Search">
+    </form>
+</div>
 
 {% if results %}
     <div class="row">
@@ -28,35 +36,11 @@
             <li>Nothing has been found.</li>
         {% endfor %}
     </div>
-
-    <!-- Pagination controls -->
-    <div class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                    <span aria-hidden="true">&lsaquo;</span>
-                </a>
-            </li>
-        {% endif %}
-
-        {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                    <span aria-hidden="true">&rsaquo;</span>
-                </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        {% endif %}
-    </div>
 {% endif %}
+
+<!-- Back to Top Button -->
+<button id="back-to-top" onclick="scrollToTop()">Top</button>
+
+<script src="{% static 'js/back_to_top.js' %}"></script>
 
 {% endblock %}
