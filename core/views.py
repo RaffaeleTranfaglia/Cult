@@ -5,12 +5,13 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
-from .models import Movie, Profile, Log
+from .models import Movie, Profile, Log, Follow
 from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.http import JsonResponse
 
 def home_view(request):
     # 6 most popular (viewed) movies
@@ -32,7 +33,9 @@ def home_view(request):
             following_profiles = user_profile.follows.all()
             for friend in following_profiles:
                 # friend's last movie logged (logs db is ordered by date in descending order)
-                logs.append(friend.logs.all()[0])
+                friend_logs = friend.logs.all()
+                if friend_logs:
+                    logs.append(friend_logs[0])
             context['friends_movies'] = sorted(logs, key=lambda x : x.date, reverse=True)[:6]
         except Profile.DoesNotExist:
             context['friends_movies'] = None
@@ -177,3 +180,20 @@ class DiaryList(ListView):
         context = super().get_context_data(**kwargs)
         context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
         return context
+    
+
+@login_required
+def toggle_follow(request, profile_id):
+    if request.method == 'POST':
+        follows = get_object_or_404(Profile, pk=profile_id)
+        follow_relation, created = Follow.objects.get_or_create(profile=request.user.profile, follows=follows)
+        
+        if not created:
+            follow_relation.delete()
+            is_following = False
+        else:
+            is_following = True
+        
+        return JsonResponse({'is_following': is_following})
+    
+    return JsonResponse({'error': 'Non POST request'}, status=400)
