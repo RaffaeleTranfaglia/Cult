@@ -1,6 +1,6 @@
 from typing import Any
 from django import forms
-from .models import Movie, Profile
+from .models import Movie, Profile, Log
 from django.shortcuts import get_object_or_404
 
 class CreateMovieForm(forms.ModelForm):
@@ -35,3 +35,13 @@ class MovieSearchForm(forms.Form):
                                 'placeholder': 'Search',
                                 'aria-label': 'Search'
                             }))
+    
+
+class LogForm(forms.ModelForm):
+    class Meta:
+        model = Log
+        fields = ['like', 'rewatch', 'just_watched']
+        
+    like = forms.BooleanField(required=False)
+    just_watched = forms.BooleanField(required=False)
+    rewatch = forms.BooleanField(required=False)

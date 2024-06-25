@@ -6,7 +6,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
 from .models import Movie, Profile, Log, Follow, WatchList, Favourite
-from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm
+from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm, LogForm
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -244,3 +244,30 @@ def toggle_favourite(request, movie_pk):
         return JsonResponse({'in_favourite': in_favourite})
     
     return JsonResponse({'error': 'Non POST request'}, status = 400)
+
+
+@login_required
+def add_log(request, movie_pk):
+    form = LogForm()
+    profile = request.user.profile
+    movie = Movie.objects.get(pk=movie_pk)
+    
+    if request.method == 'POST':
+        form = LogForm(request.POST)
+        if form.is_valid():
+            log_entry = form.save(commit=False)
+            log_entry.profile = profile
+            log_entry.movie = movie
+            log_entry.save()
+            return redirect(f"{reverse('core:movie_page', kwargs={'pk' : movie_pk})}?log=success")
+    else:
+        try:
+            existing_log = Log.objects.filter(user=request.user, movie=movie).exists()
+        except Log.DoesNotExist:
+            exsisting_log = False
+            
+    return render(request, 'movie_page.html', {
+        'form': form,
+        'existing_log': existing_log
+    })
+    

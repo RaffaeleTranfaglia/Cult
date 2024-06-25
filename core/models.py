@@ -123,7 +123,15 @@ class Log(models.Model):
     like = models.BooleanField(default=False)
     rewatch = models.BooleanField(default=False)
     just_watched = models.BooleanField(default=True)
-    date = models.DateTimeField(null=True, default=timezone.now)
+    date = models.DateTimeField(null=True)
+    
+    def save(self, *args, **kwargs):
+        if self.just_watched:
+            self.date = timezone.now()
+        else:
+            self.date = None
+            self.rewatch = False
+        super().save(*args, **kwargs)
     
     class Meta:
         ordering = ['-date']
