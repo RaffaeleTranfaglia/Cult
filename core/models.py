@@ -52,7 +52,7 @@ class Profile(models.Model):
         through='Log', 
         related_name='logs', 
         blank=True)
-    whatchlist = models.ManyToManyField(                    # watchlisted movies
+    watchlists = models.ManyToManyField(                    # watchlisted movies
         Movie, 
         through='WatchList', 
         related_name='watchlists', 

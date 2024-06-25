@@ -5,7 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
-from .models import Movie, Profile, Log, Follow
+from .models import Movie, Profile, Log, Follow, WatchList, Favourite
 from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
@@ -185,6 +185,9 @@ class DiaryList(ListView):
 @login_required
 def toggle_follow(request, profile_id):
     if request.method == 'POST':
+        if (profile_id == request.user.profile.pk):
+            return JsonResponse({'error': 'A profile cannot follow themselves.'}, status=400)
+        
         follows = get_object_or_404(Profile, pk=profile_id)
         follow_relation, created = Follow.objects.get_or_create(profile=request.user.profile, follows=follows)
         
@@ -197,3 +200,47 @@ def toggle_follow(request, profile_id):
         return JsonResponse({'is_following': is_following})
     
     return JsonResponse({'error': 'Non POST request'}, status=400)
+
+
+@login_required
+def toggle_watchlist(request, movie_pk):
+    if request.method == 'POST':
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        watchlist_relation, created = WatchList.objects.get_or_create(
+            profile=request.user.profile, 
+            movie=movie,
+            defaults={'date': timezone.now()}
+            )
+        
+        if not created:
+            watchlist_relation.delete()
+            in_watchlist = False
+        else:
+            in_watchlist = True
+            
+        return JsonResponse({'in_watchlist': in_watchlist})
+    
+    return JsonResponse({'error': 'Non POST request'}, status = 400)
+
+
+@login_required
+def toggle_favourite(request, movie_pk):
+    if request.method == 'POST':
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        favourite_relation, created = Favourite.objects.get_or_create(
+            profile=request.user.profile, 
+            movie=movie
+            )
+        
+        if not created:
+            favourite_relation.delete()
+            in_favourite = False
+        else:
+            if (Favourite.objects.filter(profile=request.user.profile).count() >= 5):
+                favourite_relation.delete()
+                return JsonResponse({'error': 'A profile can have at most 4 favourite movies.'}, status=400)
+            in_favourite = True
+            
+        return JsonResponse({'in_favourite': in_favourite})
+    
+    return JsonResponse({'error': 'Non POST request'}, status = 400)

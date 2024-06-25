@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static user_groups %}
 
 {% block title %}Cult | Profile{% endblock %}
 
@@ -13,6 +13,11 @@
 {% endblock %}
 
 {% block content %}
+
+<!-- Include csrf_token needed for the AJAX request in the following system -->
+<script>
+    var csrfToken = "{{ csrf_token }}";
+</script>
 
 <div class="container">
     <div style="position: absolute; top: 80px; left: 20px; z-index: 10;">
@@ -37,7 +42,8 @@
             <!-- Follow Button -->
             {% if object.pk != user.profile.pk %}
                 <div>
-                    <button id="follow-btn" data-profile-id="{{ object.pk }}">
+                    <button type="button" class="btn btn-outline-info btn-sm" 
+                    id="follow-btn" data-profile-id="{{ object.pk }}">
                         {% if object in request.user.profile.follows.all %}
                             Unfollow
                         {% else %}
@@ -47,21 +53,30 @@
                 </div>
             {% endif %}
             <!-- Profile Picture -->
-            <img src="{{ object.propic.url }}" class="rounded-circle mt-2" width="125" height="125">
+            <img src="{{ object.propic.url }}" class="rounded-circle mt-3" width="125" height="125">
             <!-- Username -->
-            <h2 class="mt-3">{{ object.user.username }}</h2>
+            <div class="d-flex justify-content-center align-items-center mt-2">
+                <h2 class="mb-0 text-center">
+                    {{ object.user.username }}
+                </h2>
+                <h5 class="mb-0 ml-2">
+                    {% if object.user|in_group:"business" %}
+                        <span class="badge bg-secondary text-light">STUDIO</span>
+                    {% endif %}
+                </h5>
+            </div>
             <!-- Bio -->
             <p class="mt-2">{{ object.user.profile.bio }}</p>
             <!-- Favourite Movies -->
-            {% if object.user.profile.favourites.all > 0 %}
+            {% if object.user.profile.favourites.all%}
                 <h3 class="mt-4">Favourites</h3>
                 <div class="row">
                     {% for favourite in object.user.profile.favourites.all %}
                         <div class="col-md-3">
                             <div class="card">
-                                <a href="{% url 'movie_page' favourite.movie.pk %}">
-                                    <img src="{{ favourite.movie.poster.url }}" class="card-img-top" 
-                                    alt="{{ favourite.movie.title }}">
+                                <a href="{% url 'core:movie_page' favourite.pk %}">
+                                    <img src="{{ favourite.poster.url }}" class="card-img-top" 
+                                    alt="{{ favourite.title }}">
                                 </a>
                             </div>
                         </div>
@@ -69,7 +84,7 @@
                 </div>
             {% endif %}
             <!-- Recent Logs -->
-            {% if object.user.profile.logs.all > 0 %}
+            {% if object.user.profile.logs.all%}
                 <h3 class="mt-4">Recent activities</h3>
                 <div class="row">
                     {% for log in object.user.profile.logs.all|slice:":4" %}

@@ -73,7 +73,7 @@
                     <li class="nav-item">
                         <a class="navbar-link" href="
                             {% if user.is_superuser or user.is_staff %}
-                                admin/
+                                /admin/
                             {% elif user.is_authenticated %}
                                 {% url 'core:profile_page' request.user.profile.pk %}
                             {% else %}

@@ -5,7 +5,20 @@
 
 {% block header %} {{movie.title}} {% endblock %}
 
+{% block head %}
+
+<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'js/toggle_watchlist.js' %}"></script>
+<script src="{% static 'js/toggle_favourite.js' %}"></script>
+
+{% endblock %}
+
 {% block content %}
+
+<!-- Include csrf_token needed for the AJAX request in the watchlist system -->
+<script>
+    var csrfToken = "{{ csrf_token }}";
+</script>
 
 <div style="position: absolute; top: 80px; left: 20px; z-index: 10;">
     <a href="javascript:history.back()">
@@ -42,7 +55,22 @@
                 {% if user.profile in movie.logs.profile.all %}
                     <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-secondary">Review Movie</a>
                 {% endif %}
-                <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-warning">Add to Watchlist</a>
+                <button type="button" class="btn btn-outline-warning btn-sm" 
+                    id="watchlist-btn" data-movie-pk="{{ movie.pk }}">
+                    {% if movie in request.user.profile.watchlists.all %}
+                        Remove from Watchlist
+                    {% else %}
+                        Add to Watchlist
+                    {% endif %}
+                </button>
+                <button type="button" class="btn btn-outline-info btn-sm" 
+                    id="favourite-btn" data-movie-pk="{{ movie.pk }}">
+                    {% if movie in request.user.profile.favourites.all %}
+                        Remove from Favourites
+                    {% else %}
+                        Add to Favourites
+                    {% endif %}
+                </button>
             </div>
             {% if movie.production.pk == user.profile.pk %}
                 <div class="row mt-4">
