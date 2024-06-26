@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Cult | Diary list{% endblock %}
 
@@ -8,24 +9,35 @@
 
 {% block content %}
 
+<div style="position: absolute; top: 80px; left: 20px; z-index: 10;">
+    <a href="javascript:history.back()">
+        <img src="{% static 'back.svg' %}" alt="" width="18" height="18">
+    </a>
+</div>
+
+<div style="text-align: center;">
 <h1>Movies watched by {{profile.user.username}}</h1>
+</div>
 
 <div class="row">
     {% for log in logs %}
         <div class="col-md-2 mb-4">
             <div class="card">
-                <a href="{% url 'movie_page' log.movie.pk %}">
+                <a href="{% url 'core:movie_page' log.movie.pk %}">
                     <img src="{{ log.movie.poster.url }}" class="card-img-top" alt="{{ log.movie.title }}">
                 </a>
                 <div class="card-body">
                     <div class="d-flex align-items-center">
+                        {{ log.date.date }}
                         {% if log.like %}
-                            <img src="{% static 'like.svg' %}" style="width: 12px; height: 12px;">
+                            <div class="ml-2">
+                                <img src="{% static 'like.svg' %}" style="width: 12px; height: 12px;">
+                            </div>
                         {% endif %}
                         {% if log.rewatch %}
-                            <span>
+                            <div class="ml-2">
                                 <img src="{% static 'rewatch.svg' %}" style="width: 12px; height: 12px;">
-                            </span>
+                            </div>
                         {% endif %}
                     </div>
                 </div>

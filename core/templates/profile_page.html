@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static user_groups %}
+{% load static user_groups log_ops %}
 
 {% block title %}Cult | Profile{% endblock %}
 
@@ -61,17 +61,17 @@
                 </h2>
                 <h5 class="mb-0 ml-2">
                     {% if object.user|in_group:"business" %}
-                        <span class="badge bg-secondary text-light">STUDIO</span>
+                        <span class="ml-1 badge bg-secondary text-light">STUDIO</span>
                     {% endif %}
                 </h5>
             </div>
             <!-- Bio -->
-            <p class="mt-2">{{ object.user.profile.bio }}</p>
+            <p class="mt-2">{{ object.bio }}</p>
             <!-- Favourite Movies -->
-            {% if object.user.profile.favourites.all%}
+            {% if object.favourites.all%}
                 <h3 class="mt-4">Favourites</h3>
                 <div class="row">
-                    {% for favourite in object.user.profile.favourites.all %}
+                    {% for favourite in object.favourites.all %}
                         <div class="col-md-3">
                             <div class="card">
                                 <a href="{% url 'core:movie_page' favourite.pk %}">
@@ -84,33 +84,46 @@
                 </div>
             {% endif %}
             <!-- Recent Logs -->
-            {% if object.user.profile.logs.all%}
+            {% if object.logs.all%}
                 <h3 class="mt-4">Recent activities</h3>
                 <div class="row">
-                    {% for log in object.user.profile.logs.all|slice:":4" %}
+                    {% for log in object|last_logs:4 %}
                         <div class="col-md-3">
                             <div class="card">
-                                <a href="{% url 'movie_page' log.movie.pk %}">
+                                <a href="{% url 'core:movie_page' log.movie.pk %}">
                                     <img src="{{ log.movie.poster.url }}" class="card-img-top" 
                                     alt="{{ log.movie.title }}">
                                 </a>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    {% if log.like %}
-                                        <img src="{% static 'like.svg' %}" style="width: 12px; height: 12px;">
-                                    {% endif %}
-                                    {% if log.rewatch %}
-                                        <span>
-                                            <img src="{% static 'rewatch.svg' %}" style="width: 12px; height: 12px;">
-                                        </span>
-                                    {% endif %}
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        {{ log.date.date }}
+                                        {% if log.like %}
+                                            <div class="ml-2">
+                                                <img src="{% static 'like.svg' %}" style="width: 12px; height: 12px;">
+                                            </div>
+                                        {% endif %}
+                                        {% if log.rewatch %}
+                                            <div class="ml-2">
+                                                <img src="{% static 'rewatch.svg' %}" style="width: 12px; height: 12px;">
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
             {% endif %}
+            <!-- Links -->
+            <div class="list-group list-group-flush mt-4">
+                <a href="{% url 'core:diary' object.pk %}" class="list-group-item list-group-item-action">
+                  Diary
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">Reviews</a>
+                <a href="#" class="list-group-item list-group-item-action">Watchlist</a>
+                <a href="#" class="list-group-item list-group-item-action">Following</a>
+                <a href="#" class="list-group-item list-group-item-action">Followers</a>
+            </div>
         </div>
     </div>
 </div>

@@ -40,8 +40,7 @@ class MovieSearchForm(forms.Form):
 class LogForm(forms.ModelForm):
     class Meta:
         model = Log
-        fields = ['like', 'rewatch', 'just_watched']
+        fields = ['like', 'just_watched']
         
     like = forms.BooleanField(required=False)
     just_watched = forms.BooleanField(required=False)
-    rewatch = forms.BooleanField(required=False)

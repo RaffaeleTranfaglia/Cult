@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Cult | Homepage{% endblock %}
 
@@ -7,7 +8,9 @@
 {% block content %}
 
 {% if popular_movies %}
-    <h1>Popular Movies</h1>
+    <div style="text-align: center;">
+        <h1>Popular Movies</h1>
+    </div>
     <div class="row mb-4">
         {% for movie in popular_movies %}
             <div class="col-md-2">
@@ -22,7 +25,9 @@
 {% endif %}
 
 {% if recent_movies%}
-    <h1>Latest Releases</h1>
+    <div style="text-align: center;">
+        <h1>Latest Releases</h1>
+    </div>
     <div class="row mb-4">
         {% for movie in recent_movies %}
             <div class="col-md-2">
@@ -37,7 +42,9 @@
 {% endif %}
 
 {% if request.user.is_authenticated and friends_movies %}
-    <h1>Movies Watched by Friends</h1>
+    <div style="text-align: center;">
+        <h1>Movies Watched by Friends</h1>
+    </div>
     <div class="row">
         {% for log in friends_movies %}
             <div class="col-md-2">
@@ -49,6 +56,16 @@
                         <div class="d-flex align-items-center">
                             <img src="{{ log.profile.propic.url }}" class="rounded-circle me-2" style="width: 20px; height: 20px;">
                             <span>{{ log.profile.user.username }}</span>
+                            {% if log.like %}
+                                <div class="ml-2">
+                                    <img src="{% static 'like.svg' %}" style="width: 12px; height: 12px;">
+                                </div>
+                            {% endif %}
+                            {% if log.rewatch %}
+                                <div class="ml-2">
+                                    <img src="{% static 'rewatch.svg' %}" style="width: 12px; height: 12px;">
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Cult | Log movie{% endblock %}
+
+{% block header %} Log {{movie.title}} {% endblock %}
+
+{% block content %}
+
+<div class="centered-form">
+    <div class="form-container">
+        <h2>Log {{movie.title}}</h2>
+        <form method="post"> {% csrf_token %}
+            {{form | crispy}}
+            <input type="submit" class="btn btn-success" value="Save"> 
+        </form>
+    </div>
+</div>
+
+{% endblock %}

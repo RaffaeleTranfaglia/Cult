@@ -20,5 +20,7 @@ urlpatterns = [
     path('profile/<pk>/', ProfileDetailView.as_view(), name='profile_page'),
     path('profile/<pk>/update/', update_profile_view, name='update_profile'),
     path('profile/<pk>/diary/', DiaryList.as_view(), name='diary'),
-    path('movie/<pk>/production', MovieListView.as_view(), name='production')
+    path('movie/<pk>/production', MovieListView.as_view(), name='production'),
+    path('log/create/<movie_pk>/', add_log, name='create_log'),
+    path('log/delete/<int:pk>/', LogDeleteView.as_view(), name='delete_log')
 ]

@@ -32,7 +32,7 @@ $(document).ready(function(){
                     // Redirect to login page
                     window.location.href = redirectUrl + '?next=' + encodeURIComponent(window.location.pathname);
                 } else {
-                    alert('An error occurred.');
+                    alert(xhr['responseJSON']['error']);
                 }
             }
         });

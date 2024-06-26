@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static crispy_forms_tags log_ops %}
 
 {% block title %}Cult | Movie page{% endblock %}
 
@@ -10,6 +10,7 @@
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
 <script src="{% static 'js/toggle_watchlist.js' %}"></script>
 <script src="{% static 'js/toggle_favourite.js' %}"></script>
+<script src="{% static 'js/log.js' %}"></script>
 
 {% endblock %}
 
@@ -50,7 +51,11 @@
             <!-- Buttons -->
             <div class=" mt-4">
                 {% if view.is_available %}
-                    <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-primary">Log Movie</a>
+                    <a href="{% url 'core:create_log' movie.pk %}">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="log-btn">
+                            Log
+                        </button>
+                    </a>
                 {% endif %}
                 {% if user.profile in movie.logs.profile.all %}
                     <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-secondary">Review Movie</a>
@@ -71,6 +76,15 @@
                         Add to Favourites
                     {% endif %}
                 </button>
+                {% if user.profile|has_logged:movie %}
+                    {% with last_log=user.profile|get_last_log:movie %}
+                        <a href="{% url 'core:delete_log' last_log.pk %}">
+                            <button type="button" class="btn btn-outline-danger btn-sm">
+                                Delete last Log
+                            </button>
+                        </a>
+                    {% endwith %}
+                {% endif %}
             </div>
             {% if movie.production.pk == user.profile.pk %}
                 <div class="row mt-4">
@@ -84,6 +98,5 @@
             {% endif %}
         </div>
     </div>
-</div>
 
 {% endblock %}

@@ -1,3 +1,5 @@
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
@@ -12,6 +14,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import JsonResponse
+from django.contrib.auth.models import Group
 
 def home_view(request):
     # 6 most popular (viewed) movies
@@ -33,7 +36,7 @@ def home_view(request):
             following_profiles = user_profile.follows.all()
             for friend in following_profiles:
                 # friend's last movie logged (logs db is ordered by date in descending order)
-                friend_logs = friend.logs.all()
+                friend_logs = Log.objects.filter(profile=friend)
                 if friend_logs:
                     logs.append(friend_logs[0])
             context['friends_movies'] = sorted(logs, key=lambda x : x.date, reverse=True)[:6]
@@ -108,7 +111,7 @@ class MovieUpdateView(GroupRequiredMixin, UpdateView):
 class MovieDeleteView(GroupRequiredMixin, DeleteView):
     group_required = ['business']
     model = Movie
-    template_name = 'delete_movie.html'
+    template_name = 'delete.html'
     
     def dispatch(self, request, *args, **kwargs):
         movie = self.get_object()
@@ -119,6 +122,11 @@ class MovieDeleteView(GroupRequiredMixin, DeleteView):
             # TODO add a temporary banner that confirms the action
             return redirect('core:home')
         return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['name'] = 'Movie'
+        return context
     
     def get_success_url(self):
         # TODO add a temporary banner that confirms the action
@@ -135,7 +143,7 @@ def movie_search(request):
             field = form.cleaned_data['field']
             query = form.cleaned_data['query']
             filter_args = {f"{field}__icontains": query}
-            results = Movie.objects.filter(**filter_args)
+            results = Movie.objects.filter(**filter_args)[:100]
 
     return render(request, 'movie_search.html', {'form': form, 'results': results})
 
@@ -149,7 +157,15 @@ class UserCreationView(CreateView):
 class ProfileDetailView(DetailView):
     model = Profile
     template_name = 'profile_page.html'
-    
+
+
+def in_group(user, group_name):
+    group = Group.objects.get(name=group_name)
+    if group.user_set.filter(username=user.username).exists():
+        return True
+    else:
+        return False
+
 
 @login_required
 def update_profile_view(request, pk):
@@ -174,7 +190,7 @@ class DiaryList(ListView):
     
     def get_queryset(self):
         profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
-        return profile.logs.all()
+        return Log.objects.filter(profile=profile)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -184,6 +200,9 @@ class DiaryList(ListView):
 
 @login_required
 def toggle_follow(request, profile_id):
+    if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
+        return JsonResponse({'error': 'Not in the authorized group'}, status = 400)
+    
     if request.method == 'POST':
         if (profile_id == request.user.profile.pk):
             return JsonResponse({'error': 'A profile cannot follow themselves.'}, status=400)
@@ -204,6 +223,9 @@ def toggle_follow(request, profile_id):
 
 @login_required
 def toggle_watchlist(request, movie_pk):
+    if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
+        return JsonResponse({'error': 'Not in the authorized group'}, status = 400)
+    
     if request.method == 'POST':
         movie = get_object_or_404(Movie, pk=movie_pk)
         watchlist_relation, created = WatchList.objects.get_or_create(
@@ -225,6 +247,9 @@ def toggle_watchlist(request, movie_pk):
 
 @login_required
 def toggle_favourite(request, movie_pk):
+    if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
+        return JsonResponse({'error': 'Not in the authorized group'}, status = 400)
+    
     if request.method == 'POST':
         movie = get_object_or_404(Movie, pk=movie_pk)
         favourite_relation, created = Favourite.objects.get_or_create(
@@ -248,26 +273,63 @@ def toggle_favourite(request, movie_pk):
 
 @login_required
 def add_log(request, movie_pk):
-    form = LogForm()
-    profile = request.user.profile
+    if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
+        #TODO add a denial message
+        return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
+    
     movie = Movie.objects.get(pk=movie_pk)
+    
+    if movie.release_date > timezone.now().date():
+        #TODO add a denial message
+        return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     
     if request.method == 'POST':
         form = LogForm(request.POST)
         if form.is_valid():
+            profile = request.user.profile
+            existing_log = Log.objects.filter(profile=profile, movie=movie).exists()
             log_entry = form.save(commit=False)
             log_entry.profile = profile
             log_entry.movie = movie
+            if existing_log:
+                log_entry.just_watched = True
+            log_entry.rewatch = True if existing_log else False
             log_entry.save()
-            return redirect(f"{reverse('core:movie_page', kwargs={'pk' : movie_pk})}?log=success")
+            movie.views_total += 1
+            movie.save()
+            return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     else:
-        try:
-            existing_log = Log.objects.filter(user=request.user, movie=movie).exists()
-        except Log.DoesNotExist:
-            exsisting_log = False
-            
-    return render(request, 'movie_page.html', {
-        'form': form,
-        'existing_log': existing_log
-    })
+        form = LogForm()
+        return render(request, 'create_log.html', {'form': form, 'movie': movie})
     
+    
+class LogDeleteView(GroupRequiredMixin, DeleteView):
+    group_required = ['base', 'business']
+    model = Log
+    template_name = 'delete.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        profile_who_logged = self.get_object().profile
+        user_profile = request.user.profile
+
+        if profile_who_logged != user_profile:
+            messages.error(request, "You do not have permission to delete this log.")
+            # TODO add a temporary banner that confirms the action
+            return redirect('core:home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        movie = self.get_object().movie
+        movie.views_total -= 1
+        movie.save()
+        # Perform the actual deletion
+        response = super().delete(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['name'] = 'Log'
+        return context
+
+    def get_success_url(self):
+        # TODO add a temporary banner that confirms the action
+        return reverse('core:profile_page', kwargs={'pk': self.get_object().profile.pk})
