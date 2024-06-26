@@ -1,5 +1,4 @@
 from django.db.models.base import Model as Model
-from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
@@ -186,7 +185,7 @@ class DiaryList(ListView):
     model = Log
     template_name = 'diary_list.html'
     context_object_name = 'logs'
-    paginate_by = 12
+    paginate_by = 24
     
     def get_queryset(self):
         profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
@@ -250,10 +249,14 @@ def toggle_favourite(request, movie_pk):
     if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
         return JsonResponse({'error': 'Not in the authorized group'}, status = 400)
     
+    movie = get_object_or_404(Movie, pk=movie_pk)
+    profile = request.user.profile
+    if not Log.objects.filter(profile=profile, movie=movie).exists():
+        return JsonResponse({'error': 'Only logged movies can be added to favourites'}, status = 400)
+    
     if request.method == 'POST':
-        movie = get_object_or_404(Movie, pk=movie_pk)
         favourite_relation, created = Favourite.objects.get_or_create(
-            profile=request.user.profile, 
+            profile=profile, 
             movie=movie
             )
         
@@ -261,7 +264,7 @@ def toggle_favourite(request, movie_pk):
             favourite_relation.delete()
             in_favourite = False
         else:
-            if (Favourite.objects.filter(profile=request.user.profile).count() >= 5):
+            if (Favourite.objects.filter(profile=profile).count() >= 5):
                 favourite_relation.delete()
                 return JsonResponse({'error': 'A profile can have at most 4 favourite movies.'}, status=400)
             in_favourite = True
@@ -333,3 +336,19 @@ class LogDeleteView(GroupRequiredMixin, DeleteView):
     def get_success_url(self):
         # TODO add a temporary banner that confirms the action
         return reverse('core:profile_page', kwargs={'pk': self.get_object().profile.pk})
+    
+    
+class WatchListView(ListView):
+    model = Movie
+    template_name = 'watch_list.html'
+    context_object_name = 'watchlist'
+    paginate_by = 24
+    
+    def get_queryset(self):
+        profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        return WatchList.objects.filter(profile=profile)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        return context

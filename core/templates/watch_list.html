@@ -1,31 +1,32 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Cult | Movies list{% endblock %}
+{% block title %}Cult | Watchlist{% endblock %}
 
 {% block header %} 
-    {{profile.user.username}}'s movies
+    {{profile.user.username}}'s watchlist
 {% endblock %}
 
 {% block content %}
 
-<div style="text-align: center;">
-    <h2>Movies produced by {{profile.user.username}}</h2>
+<div style="position: absolute; top: 80px; left: 20px; z-index: 10;">
+    <a href="javascript:history.back()">
+        <img src="{% static 'back.svg' %}" alt="" width="18" height="18">
+    </a>
 </div>
 
-
-<div style="position: absolute; top: 65px; right: 20px; z-index: 10;">
-    <a href="{% url 'core:create_movie' %}">
-        <button type="button" class="btn btn-outline-success">Add</button>
-    </a>
+<div style="text-align: center;">
+    <h1>Movies watchlisted by {{profile.user.username}}</h1>
 </div>
 
 
 <div class="row">
-    {% for movie in movies %}
+    {% for entry in watchlist %}
         <div class="col-md-2 mb-3">
             <div class="card">
-                <a href="{% url 'core:movie_page' movie.pk %}">
-                    <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                <a href="{% url 'core:movie_page' entry.movie.pk %}">
+                    <img src="{{ entry.movie.poster.url }}" class="card-img-top" 
+                    alt="{{ entry.movie.title }}">
                 </a>
             </div>
         </div>
@@ -33,7 +34,7 @@
             </div><div class="row">
         {% endif %}
     {% empty %}
-        <li>No movies produced yet.</li>
+        <li>No movies watchlisted yet.</li>
     {% endfor %}
 </div>
 

@@ -57,8 +57,8 @@
                         </button>
                     </a>
                 {% endif %}
-                {% if user.profile in movie.logs.profile.all %}
-                    <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-secondary">Review Movie</a>
+                {% if user.profile|has_logged:movie %}
+                    <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-secondary btn-sm">Review Movie</a>
                 {% endif %}
                 <button type="button" class="btn btn-outline-warning btn-sm" 
                     id="watchlist-btn" data-movie-pk="{{ movie.pk }}">
@@ -68,14 +68,16 @@
                         Add to Watchlist
                     {% endif %}
                 </button>
-                <button type="button" class="btn btn-outline-info btn-sm" 
-                    id="favourite-btn" data-movie-pk="{{ movie.pk }}">
-                    {% if movie in request.user.profile.favourites.all %}
-                        Remove from Favourites
-                    {% else %}
-                        Add to Favourites
-                    {% endif %}
-                </button>
+                {% if user.profile|has_logged:movie %}
+                    <button type="button" class="btn btn-outline-info btn-sm" 
+                        id="favourite-btn" data-movie-pk="{{ movie.pk }}">
+                        {% if movie in request.user.profile.favourites.all %}
+                            Remove from Favourites
+                        {% else %}
+                            Add to Favourites
+                        {% endif %}
+                    </button>
+                {% endif %}
                 {% if user.profile|has_logged:movie %}
                     {% with last_log=user.profile|get_last_log:movie %}
                         <a href="{% url 'core:delete_log' last_log.pk %}">

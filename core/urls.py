@@ -22,5 +22,6 @@ urlpatterns = [
     path('profile/<pk>/diary/', DiaryList.as_view(), name='diary'),
     path('movie/<pk>/production', MovieListView.as_view(), name='production'),
     path('log/create/<movie_pk>/', add_log, name='create_log'),
-    path('log/delete/<int:pk>/', LogDeleteView.as_view(), name='delete_log')
+    path('log/delete/<int:pk>/', LogDeleteView.as_view(), name='delete_log'),
+    path('watchlist/<int:pk>/', WatchListView.as_view(), name='watchlist')
 ]
