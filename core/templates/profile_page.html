@@ -117,9 +117,11 @@
             <!-- Links -->
             <div class="list-group list-group-flush mt-4">
                 <a href="{% url 'core:diary' object.pk %}" class="list-group-item list-group-item-action">
-                  Diary
+                    Diary
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">Reviews</a>
+                <a href="{% url 'core:profile_review_list' object.pk %}" class="list-group-item list-group-item-action">
+                    Reviews
+                </a>
                 <a href="{% url 'core:watchlist' object.pk %}" class="list-group-item list-group-item-action">
                     Watchlist
                 </a>

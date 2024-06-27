@@ -96,12 +96,6 @@ class Review(models.Model):
     
     class Meta:
         ordering = ['-date', 'profile']
-        constraints = [
-            models.UniqueConstraint(
-                fields = ['profile', 'movie'],
-                name = 'unique_review'
-            )
-        ]
 
 
 class Star(models.Model):

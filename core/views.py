@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
 from .models import Movie, Profile, Log, Follow, WatchList, Favourite
-from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm, LogForm, ProfileSearchForm
+from .forms import *
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -359,7 +359,7 @@ class LogDeleteView(GroupRequiredMixin, DeleteView):
         user_profile = request.user.profile
 
         if profile_who_logged != user_profile:
-            messages.error(request, "You do not have permission to delete this log.")
+            messages.error(request, "You do not have permissions for this action.")
             # TODO add a temporary banner that confirms the action
             return redirect('core:home')
         return super().dispatch(request, *args, **kwargs)
@@ -384,6 +384,56 @@ class WatchListView(ListView):
     def get_queryset(self):
         profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
         return WatchList.objects.filter(profile=profile)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        return context
+    
+    
+@login_required
+def create_review(request, movie_pk):
+    if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
+        #TODO add a denial message
+        return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
+    
+    movie = get_object_or_404(Movie, pk=movie_pk)
+    
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.profile = request.user.profile
+            review.movie = movie
+            review.save()
+            return redirect(reverse('core:profile_review_list', kwargs={'pk': request.user.profile.pk}))
+    else:
+        form = ReviewForm()
+    return render(request, 'create_review.html', {'form': form, 'movie': movie})
+
+
+class ReviewDeleteView(LogDeleteView):
+    model = Review
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['name'] = 'Review'
+        return context
+
+    def get_success_url(self):
+        # TODO add a temporary banner that confirms the action
+        return reverse('core:profile_review_list', kwargs={'pk': self.get_object().profile.pk})
+    
+    
+class ProfileReviewListView(ListView):
+    model = Review
+    template_name = 'profile_review_list.html'
+    context_object_name = 'reviews'
+    paginate_by = 24
+    
+    def get_queryset(self):
+        profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        return Review.objects.filter(profile=profile)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

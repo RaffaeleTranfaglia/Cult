@@ -24,7 +24,10 @@ urlpatterns = [
     path('movie/<pk>/production', MovieListView.as_view(), name='production'),
     path('profile/<pk>/followings/', FollowingView.as_view(), name='following_list'),
     path('profile/<pk>/followers/', FollowersView.as_view(), name='followers_list'),
+    path('profile/<pk>/reviews', ProfileReviewListView.as_view(), name='profile_review_list'),
     path('log/create/<movie_pk>/', add_log, name='create_log'),
     path('log/delete/<int:pk>/', LogDeleteView.as_view(), name='delete_log'),
-    path('watchlist/<int:pk>/', WatchListView.as_view(), name='watchlist')
+    path('watchlist/<int:pk>/', WatchListView.as_view(), name='watchlist'),
+    path('review/create/<int:movie_pk>/', create_review, name='create_review'),
+    path('review/delete/<int:pk>/', ReviewDeleteView.as_view(), name='delete_review')
 ]

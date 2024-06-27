@@ -1,6 +1,5 @@
-from typing import Any
 from django import forms
-from .models import Movie, Profile, Log
+from .models import Movie, Profile, Log, Review
 from django.shortcuts import get_object_or_404
 
 class CreateMovieForm(forms.ModelForm):
@@ -53,3 +52,9 @@ class LogForm(forms.ModelForm):
         
     like = forms.BooleanField(required=False)
     just_watched = forms.BooleanField(required=False)
+    
+    
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['text']

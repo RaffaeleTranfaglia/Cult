@@ -1,4 +1,4 @@
-from .models import Profile, Movie, Log, WatchList
+from .models import Profile, Movie, Log, WatchList, Review, Star
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
@@ -68,3 +68,31 @@ def decrement_views(sender, instance, **kwargs):
     movie = instance.movie
     movie.views_total -= 1
     movie.save()
+    
+    
+# When a review is added or deleted, the reviews number of the movie is updated
+@receiver(post_save, sender=Review)
+def increment_reviews(sender, instance, **kwargs):
+    movie = instance.movie
+    movie.reviews_total += 1
+    movie.save()
+
+@receiver(post_delete, sender=Review)
+def decrement_reviews(sender, instance, **kwargs):
+    movie = instance.movie
+    movie.reviews_total -= 1
+    movie.save()
+    
+    
+# When a star is added or deleted, the stars number of the review is updated
+@receiver(post_save, sender=Star)
+def increment_stars(sender, instance, **kwargs):
+    review = instance.review
+    review.stars_total += 1
+    review.save()
+    
+@receiver(post_delete, sender=Star)
+def decrement_stars(sender, instance, **kwargs):
+    review = instance.review
+    review.stars_total -= 1
+    review.save()

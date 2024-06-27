@@ -58,7 +58,11 @@
                     </a>
                 {% endif %}
                 {% if user.profile|has_logged:movie %}
-                    <a href="{% url 'core:movie_page' movie.pk %}" class="btn btn-outline-secondary btn-sm">Review Movie</a>
+                    <a href="{% url 'core:create_review' movie.pk %}">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="log-btn">
+                            Review
+                        </button>
+                    </a>
                 {% endif %}
                 <button type="button" class="btn btn-outline-warning btn-sm" 
                     id="watchlist-btn" data-movie-pk="{{ movie.pk }}">
