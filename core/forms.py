@@ -36,6 +36,15 @@ class MovieSearchForm(forms.Form):
                                 'aria-label': 'Search'
                             }))
     
+    
+class ProfileSearchForm(forms.Form):
+    query = forms.CharField(max_length=255, required=True, 
+                            widget=forms.TextInput(attrs={
+                                'class': 'from-control',
+                                'type': 'search',
+                                'placeholder': 'Search',
+                                'aria-label': 'Search'
+                            }))
 
 class LogForm(forms.ModelForm):
     class Meta:

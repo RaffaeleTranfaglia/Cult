@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags static %} 
+
+{% block title %}Cult | Profile search{% endblock %}
+
+{% block header %} Profile search {% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/back_to_top_button_style.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<div class="row justify-content-center mt-3 mb-3">
+    <form method="get" action="{% url 'core:profile_search' %}" class="row">
+        {{ form.query }}
+        <input type="submit" class="btn btn-outline-success" value="Search">
+    </form>
+</div>
+
+{% if results %}
+    <div class="container d-flex flex-column align-items-center">
+        {% for profile in results %}
+            <div class="mt-2">
+                <img style="width:55px;height:55px" class="object-fit-fill rounded-circle img-thumbnail" 
+                src="{{ profile.propic.url }}" alt="{{ profile.user.username }}">
+                <a href="{% url 'core:profile_page' profile.pk %}">
+                    {{ profile.user.username }}
+                </a>
+            </div>
+        {% empty %}
+            <li>Nothing has been found.</li>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Back to Top Button -->
+<button id="back-to-top" onclick="scrollToTop()">Top</button>
+
+<script src="{% static 'js/back_to_top.js' %}"></script>
+
+{% endblock %}

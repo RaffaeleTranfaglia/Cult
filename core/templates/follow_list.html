@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cult | 
+{% if reason == 'following' %}
+    Profile followings
+{% elif reason == 'followers' %}
+    Profile followers
+{% endif %}
+{% endblock %}
+
+{% block header %}
+{% if reason == 'following' %}
+        Profile followings
+    {% elif reason == 'followers' %}
+        Profile followers
+    {% endif %}
+{% endblock %}
+
+{% block head %}
+
+<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<div style="position: absolute; top: 80px; left: 20px; z-index: 10;">
+    <a href="javascript:history.back()">
+        <img src="{% static 'back.svg' %}" alt="" width="18" height="18">
+    </a>
+</div>
+
+<div style="text-align: center;" class="mt-2">
+    {% if reason == 'following' %}
+        <h1>Profiles {{profile.user.username}} follows</h1>
+    {% elif reason == 'followers' %}
+        <h1>{{profile.user.username}}'s followers</h1>
+    {% endif %}
+</div>
+
+<div class="container d-flex flex-column align-items-center">
+    {% for follow in object %}
+        <div class="mt-2">
+            <img style="width:55px;height:55px" class="object-fit-fill rounded-circle img-thumbnail" 
+            src="{{ follow.propic.url }}" alt="{{ follow.user.username }}">
+            <a href="{% url 'core:profile_page' follow.pk %}">
+                {{ follow.user.username }}
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination controls -->
+<div class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                <span aria-hidden="true">&lsaquo;</span>
+            </a>
+        </li>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                <span aria-hidden="true">&rsaquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    {% endif %}
+</div>
+
+{% endblock %}

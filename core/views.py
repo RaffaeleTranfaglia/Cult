@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
 from .models import Movie, Profile, Log, Follow, WatchList, Favourite
-from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm, LogForm
+from .forms import CreateMovieForm, UpdateProfileForm, MovieSearchForm, LogForm, ProfileSearchForm
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -134,7 +134,7 @@ class MovieDeleteView(GroupRequiredMixin, DeleteView):
     
 def movie_search(request):
     form = MovieSearchForm()
-    results = Movie.objects.all()
+    results = Movie.objects.all()[:100]
 
     if request.method == 'GET' and 'field' in request.GET:
         form = MovieSearchForm(request.GET)
@@ -150,14 +150,59 @@ def movie_search(request):
 class UserCreationView(CreateView):
     form_class = UserCreationForm
     template_name = 'user_create.html'
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('core:login')
 
 
 class ProfileDetailView(DetailView):
     model = Profile
     template_name = 'profile_page.html'
+    
+    
+def profile_search(request):
+    form = ProfileSearchForm()
+    results = Profile.objects.all()[:100]
+
+    if request.method == 'GET':
+        form = ProfileSearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = Profile.objects.filter(user__username__icontains=query)[:100]
+
+    return render(request, 'profile_search.html', {'form': form, 'results': results})
 
 
+class FollowingView(ListView):
+    model = Profile
+    template_name = 'follow_list.html'
+    context_object_name = 'object'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        return profile.follows.all().order_by('user__username')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        context['reason'] = 'following'
+        return context
+    
+
+class FollowersView(FollowingView):
+    def get_queryset(self):
+        profile = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        return profile.followers.all().order_by('user__username')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
+        context['reason'] = 'followers'
+        return context
+
+
+'''
+Return True if the user is in the group, otherwise False.
+'''
 def in_group(user, group_name):
     group = Group.objects.get(name=group_name)
     if group.user_set.filter(username=user.username).exists():

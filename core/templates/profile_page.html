@@ -123,8 +123,14 @@
                 <a href="{% url 'core:watchlist' object.pk %}" class="list-group-item list-group-item-action">
                     Watchlist
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">Following</a>
-                <a href="#" class="list-group-item list-group-item-action">Followers</a>
+                <a href="{% url 'core:following_list' object.pk %}" 
+                class="list-group-item list-group-item-action">
+                    Following
+                </a>
+                <a href="{% url 'core:followers_list' object.pk %}" 
+                class="list-group-item list-group-item-action">
+                    Followers
+                </a>
             </div>
         </div>
     </div>
