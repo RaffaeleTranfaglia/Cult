@@ -298,8 +298,6 @@ def add_log(request, movie_pk):
                 log_entry.just_watched = True
             log_entry.rewatch = True if existing_log else False
             log_entry.save()
-            movie.views_total += 1
-            movie.save()
             return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     else:
         form = LogForm()
@@ -321,12 +319,6 @@ class LogDeleteView(GroupRequiredMixin, DeleteView):
             return redirect('core:home')
         return super().dispatch(request, *args, **kwargs)
     
-    def delete(self, request, *args, **kwargs):
-        movie = self.get_object().movie
-        movie.views_total -= 1
-        movie.save()
-        # Perform the actual deletion
-        response = super().delete(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

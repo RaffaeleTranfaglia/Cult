@@ -1,5 +1,5 @@
 from .models import Profile, Movie, Log, WatchList
-from django.db.models.signals import post_save, m2m_changed, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from os.path import join
@@ -54,3 +54,17 @@ def synchronize_watchlist(sender, instance, **kwargs):
     if (WatchList.objects.filter(profile=profile, movie=movie).exists()):
         watchlist_instance = WatchList.objects.get(profile=profile, movie=movie)
         watchlist_instance.delete()
+        
+
+# When a log is added or deleted, the views of the movie are updated
+@receiver(post_save, sender=Log)
+def increment_views(sender, instance, **kwargs):
+    movie = instance.movie
+    movie.views_total += 1
+    movie.save()
+
+@receiver(post_delete, sender=Log)
+def decrement_views(sender, instance, **kwargs):
+    movie = instance.movie
+    movie.views_total -= 1
+    movie.save()
