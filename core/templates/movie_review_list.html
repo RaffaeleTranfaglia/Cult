@@ -1,0 +1,17 @@
+{% extends "review_list.html" %}
+
+{% block title %}Cult |Movie reviews{% endblock %}
+
+{% block header %} Movie reviews {% endblock %}
+
+{% block page_header %} <h1> {{movie.title}}'s reviews </h1> {% endblock %}
+
+{% block review_lhs %}
+
+<a href="{% url 'core:profile_page' review.profile.pk %}">
+    <img src="{{ review.profile.propic.url }}" alt="" 
+    class="object-fit-fill rounded-circle img-thumbnail" style="width:55px;height:55px">
+    {{review.profile.user.username}}
+</a>
+
+{% endblock %}

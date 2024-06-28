@@ -72,10 +72,12 @@ def decrement_views(sender, instance, **kwargs):
     
 # When a review is added or deleted, the reviews number of the movie is updated
 @receiver(post_save, sender=Review)
-def increment_reviews(sender, instance, **kwargs):
-    movie = instance.movie
-    movie.reviews_total += 1
-    movie.save()
+def increment_reviews(sender, instance, update_fields, **kwargs):
+    # exclude save where the Review is not create but updated
+    if not update_fields:
+        movie = instance.movie
+        movie.reviews_total += 1
+        movie.save()
 
 @receiver(post_delete, sender=Review)
 def decrement_reviews(sender, instance, **kwargs):
@@ -89,10 +91,10 @@ def decrement_reviews(sender, instance, **kwargs):
 def increment_stars(sender, instance, **kwargs):
     review = instance.review
     review.stars_total += 1
-    review.save()
+    review.save(update_fields=['stars_total'])
     
 @receiver(post_delete, sender=Star)
 def decrement_stars(sender, instance, **kwargs):
     review = instance.review
     review.stars_total -= 1
-    review.save()
+    review.save(update_fields=['stars_total'])

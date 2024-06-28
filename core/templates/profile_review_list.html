@@ -1,66 +1,24 @@
-{% extends "base.html" %}
-{% load static%}
+{% extends "review_list.html" %}
 
-{% block title %}Cult | Profile review list{% endblock %}
+{% block title %}Cult |Profile review list{% endblock %}
 
 {% block header %} Profile review list {% endblock %}
 
-{% block head %}
+{% block page_header %} <h1> {{profile.user.username}}'s reviews </h1> {% endblock %}
 
-<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+{% block review_lhs %}
+
+<a href="{% url 'core:movie_page' review.movie.pk %}">
+    <img src="{{ review.movie.poster.url }}" alt="{{ review.movie.title }} poster" 
+    class="img-thumbnail" style="width: 100px; height: auto;">
+</a>
 
 {% endblock %}
 
-{% block content %}
+{% block review_bottom %}
 
-<div style="position: absolute; top: 80px; left: 20px; z-index: 10;">
-    <a href="javascript:history.back()">
-        <img src="{% static 'back.svg' %}" alt="" width="18" height="18">
-    </a>
-</div>
-
-<div style="text-align: center;" class="mt-2">
-    <h1> {{profile.user.username}}'s reviews </h1>
-</div>
-
-<div class="container d-flex flex-column align-items-center">
-    {% for review in reviews %}
-        <li>
-        {{ review.movie.title }}: {{ review.text }} ({{ review.stars_total }} stars)
-        {% if profile.pk == request.user.profile.pk %}
-            <a href="{% url 'core:delete_review' review.pk %}">Delete</a>
-        {% endif %}
-        </li>
-    {% endfor %}
-</div>
-
-<!-- Pagination controls -->
-<div class="pagination justify-content-center">
-    {% if page_obj.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page=1">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                <span aria-hidden="true">&lsaquo;</span>
-            </a>
-        </li>
-    {% endif %}
-
-    {% if page_obj.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                <span aria-hidden="true">&rsaquo;</span>
-            </a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-    {% endif %}
-</div>
+{% if profile.pk == request.user.profile.pk %}
+    <a href="{% url 'core:delete_review' review.pk %}" class="text-danger">Delete</a>
+{% endif %}
 
 {% endblock %}

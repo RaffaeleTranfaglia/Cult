@@ -3,10 +3,10 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
-from .models import Movie, Profile, Log, Follow, WatchList, Favourite
+from .models import *
 from .forms import *
 from braces.views import GroupRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
@@ -439,3 +439,44 @@ class ProfileReviewListView(ListView):
         context = super().get_context_data(**kwargs)
         context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
         return context
+    
+    
+class MovieReviewListView(ListView):
+    model = Review
+    template_name = 'movie_review_list.html'
+    context_object_name = 'reviews'
+    paginate_by = 24
+    
+    def get_queryset(self):
+        movie = get_object_or_404(Movie, pk=self.kwargs['pk'])
+        return Review.objects.filter(movie=movie).order_by('-stars_total')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['movie'] = get_object_or_404(Movie, pk=self.kwargs['pk'])
+        return context
+    
+    
+@login_required
+def toggle_star(request, review_pk):
+    if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
+        return JsonResponse({'error': 'Not in the authorized group'}, status = 400)
+    
+    review = get_object_or_404(Review, pk=review_pk)
+    profile = request.user.profile
+    
+    if request.method == 'POST':
+        star_relation, created = Star.objects.get_or_create(
+            profile=profile, 
+            review=review
+            )
+        
+        if not created:
+            star_relation.delete()
+            starred = False
+        else:
+            starred = True
+            
+        return JsonResponse({'starred': starred})
+    
+    return JsonResponse({'error': 'Non POST request'}, status = 400)

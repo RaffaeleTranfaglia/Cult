@@ -10,7 +10,6 @@
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
 <script src="{% static 'js/toggle_watchlist.js' %}"></script>
 <script src="{% static 'js/toggle_favourite.js' %}"></script>
-<script src="{% static 'js/log.js' %}"></script>
 
 {% endblock %}
 
@@ -46,7 +45,11 @@
                 </a>
             </p>
             <p><strong>Total Views:</strong> {{ movie.views_total }}</p>
-            <p><strong>Total Reviews:</strong> {{ movie.reviews_total }}</p>
+            <p><strong>Total Reviews:</strong> 
+                <a href="{% url 'core:movie_review_list' movie.pk %}">
+                    {{ movie.reviews_total }}
+                </a>
+            </p>
 
             <!-- Buttons -->
             <div class=" mt-4">
@@ -57,7 +60,7 @@
                         </button>
                     </a>
                 {% endif %}
-                {% if user.profile|has_logged:movie %}
+                {% if user.profile and user.profile|has_logged:movie %}
                     <a href="{% url 'core:create_review' movie.pk %}">
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="log-btn">
                             Review
@@ -72,7 +75,7 @@
                         Add to Watchlist
                     {% endif %}
                 </button>
-                {% if user.profile|has_logged:movie %}
+                {% if user.profile and user.profile|has_logged:movie %}
                     <button type="button" class="btn btn-outline-info btn-sm" 
                         id="favourite-btn" data-movie-pk="{{ movie.pk }}">
                         {% if movie in request.user.profile.favourites.all %}
@@ -82,7 +85,7 @@
                         {% endif %}
                     </button>
                 {% endif %}
-                {% if user.profile|has_logged:movie %}
+                {% if user.profile and user.profile|has_logged:movie %}
                     {% with last_log=user.profile|get_last_log:movie %}
                         <a href="{% url 'core:delete_log' last_log.pk %}">
                             <button type="button" class="btn btn-outline-danger btn-sm">

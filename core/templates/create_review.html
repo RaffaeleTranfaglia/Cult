@@ -7,15 +7,13 @@
 
 {% block content %}
 
-<div style="margin-top: 170px;">
-    <div class="centered-form">
-        <div class="form-container">
-            <h2>Add a review</h2>
-            <form method="post"> {% csrf_token %}
-                {{form | crispy}}
-                <input type="submit" class="btn btn-success" value="Publish"> 
-            </form>
-        </div>
+<div class="centered-form">
+    <div class="form-container">
+        <h2>Add a review</h2>
+        <form method="post"> {% csrf_token %}
+            {{form | crispy}}
+            <input type="submit" class="btn btn-success" value="Publish"> 
+        </form>
     </div>
 </div>
 
