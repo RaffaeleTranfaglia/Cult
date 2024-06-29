@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Cult | Profile upgrade request{% endblock %}
+
+{% block header %} Profile upgrade request {% endblock %}
+
+{% block head %}
+
+<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'js/profile_upgrade_request.js' %}"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<h2>Chat with {{ staff_user.username }}</h2>
+<div id="chat-log"></div>
+<input id="chat-message-input" type="text" size="100">
+<button id="chat-message-submit">Send</button>
+
+<script>
+    const room_name = "{{ request.user.username }}";
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/request/' + room_name + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        $('#chat-log').append('<div>' + data.username + ':' + data.message + '</div>');
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat closed.');
+    };
+
+    $('#chat-message-submit').click(function() {
+        const message = $('#chat-message-input').val();
+        chatSocket.send(JSON.stringify({
+            'username': {{request.user.username}},
+            'message': message
+        }));
+        $('#chat-message-input').val('');
+    });
+</script>
+
+{% endblock %}

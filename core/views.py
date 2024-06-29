@@ -13,7 +13,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import JsonResponse
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
+import random
 
 def home_view(request):
     # 6 most popular (viewed) movies
@@ -480,3 +481,20 @@ def toggle_star(request, review_pk):
         return JsonResponse({'starred': starred})
     
     return JsonResponse({'error': 'Non POST request'}, status = 400)
+
+
+def get_random_staff():
+    staff_users = User.objects.filter(is_staff=True)
+    return random.choice(staff_users) if staff_users else None
+
+@login_required
+def request_upgrade(request):
+    staff_user = get_random_staff()
+    
+    if not staff_user:
+        # Handle the case where no staff is available
+        return redirect('core:home')
+    
+    return render(request, 'upgrade_request.html', {
+        'staff_user': staff_user,
+    })

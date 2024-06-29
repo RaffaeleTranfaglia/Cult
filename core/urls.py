@@ -37,5 +37,7 @@ urlpatterns = [
     
     path('review/create/<int:movie_pk>/', create_review, name='create_review'),
     path('review/delete/<int:pk>/', ReviewDeleteView.as_view(), name='delete_review'),
-    path('review/toggle_star/<int:review_pk>/', toggle_star, name='toggle_star')
+    path('review/toggle_star/<int:review_pk>/', toggle_star, name='toggle_star'),
+    
+    path('request_upgrade/', request_upgrade, name='request_upgrade')
 ]
