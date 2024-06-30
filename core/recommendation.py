@@ -56,7 +56,7 @@ def calculate_similarity(profile: Profile, movies: dict[int, list[float]]) -> di
     movie_vectors = np.array(list(movies.values()))
     
     profile_vector = get_profile_average_vector(profile)
-    if profile_vector.size == 0:
+    if len(profile_vector) == 0:
         return None
     
     '''

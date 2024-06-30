@@ -51,7 +51,6 @@ def home_view(request):
         except Profile.DoesNotExist:
             context['recommended_movies'] = None
             
-    
     return render(request, template_name='home.html', context=context)
 
 
@@ -63,10 +62,10 @@ class MovieCreateView(GroupRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.production = self.request.user.profile
+        messages.success(self.request, "Movie created successfully!")
         return super().form_valid(form)
     
     def get_success_url(self):
-        # TODO add a temporary banner that confirms the action
         return reverse('core:movie_page', kwargs={'pk' : self.object.pk})
 
 
@@ -84,6 +83,7 @@ class MovieListView(ListView):
         context = super().get_context_data(**kwargs)
         context['profile'] = get_object_or_404(Profile, user__profile__pk=self.kwargs['pk'])
         return context
+    
 
 class MovieDetailView(DetailView):
     model = Movie
@@ -106,12 +106,14 @@ class MovieUpdateView(GroupRequiredMixin, UpdateView):
 
         if movie.production != user_profile:
             messages.error(request, "You do not have permission to modify this movie.")
-            # TODO add a temporary banner that confirms the action
             return redirect('core:home')
         return super().dispatch(request, *args, **kwargs)
     
+    def form_valid(self, form):
+        messages.success(self.request, "Movie updated successfully!")
+        return super().form_valid(form)
+    
     def get_success_url(self):
-        # TODO add a temporary banner that confirms the action
         return reverse('core:movie_page', kwargs={'pk' : self.object.pk})
     
 
@@ -126,7 +128,6 @@ class MovieDeleteView(GroupRequiredMixin, DeleteView):
 
         if movie.production != user_profile:
             messages.error(request, "You do not have permission to delete this movie.")
-            # TODO add a temporary banner that confirms the action
             return redirect('core:home')
         return super().dispatch(request, *args, **kwargs)
     
@@ -135,8 +136,11 @@ class MovieDeleteView(GroupRequiredMixin, DeleteView):
         context['name'] = 'Movie'
         return context
     
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Movie deleted successfully!")
+        return super().delete(request, *args, **kwargs)
+    
     def get_success_url(self):
-        # TODO add a temporary banner that confirms the action
         return reverse('core:home')
     
     
@@ -159,6 +163,10 @@ class UserCreationView(CreateView):
     form_class = UserCreationForm
     template_name = 'user_create.html'
     success_url = reverse_lazy('core:login')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Profile created successfully!")
+        return super().form_valid(form)
 
 
 class ProfileDetailView(DetailView):
@@ -222,12 +230,13 @@ def in_group(user, group_name):
 @login_required
 def update_profile_view(request, pk):
     if pk != str(request.user.profile.pk):
-        # TODO add a temporary banner that confirms the action
+        messages.error(request, "You do not have the permission to update this profile!")
         return redirect('core:home')
     if request.method == 'POST':
         form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
+            messages.success(request, "Profile updated successfully!")
             return redirect(reverse('core:profile_page', kwargs={'pk' : request.user.profile.pk}))
     else:
         form = UpdateProfileForm(instance=request.user.profile)
@@ -330,14 +339,12 @@ def toggle_favourite(request, movie_pk):
 @login_required
 def add_log(request, movie_pk):
     if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
-        #TODO add a denial message
         messages.error(request, "You do not have permission to add a log for this movie.")
         return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     
     movie = Movie.objects.get(pk=movie_pk)
     
     if movie.release_date > timezone.now().date():
-        #TODO add a denial message
         messages.error(request, "You cannot log a movie that hasn't been released yet.")
         return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     
@@ -353,6 +360,7 @@ def add_log(request, movie_pk):
                 log_entry.just_watched = True
             log_entry.rewatch = True if existing_log else False
             log_entry.save()
+            messages.success(request, "Movie logged successfully.")
             return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     else:
         form = LogForm()
@@ -370,18 +378,19 @@ class LogDeleteView(GroupRequiredMixin, DeleteView):
 
         if profile_who_logged != user_profile:
             messages.error(request, "You do not have permissions for this action.")
-            # TODO add a temporary banner that confirms the action
             return redirect('core:home')
         return super().dispatch(request, *args, **kwargs)
-    
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['name'] = 'Log'
         return context
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Log deleted successfully!")
+        return super().delete(request, *args, **kwargs)
 
     def get_success_url(self):
-        # TODO add a temporary banner that confirms the action
         return reverse('core:profile_page', kwargs={'pk': self.get_object().profile.pk})
     
     
@@ -404,7 +413,7 @@ class WatchListView(ListView):
 @login_required
 def create_review(request, movie_pk):
     if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
-        #TODO add a denial message
+        messages.error(request, "You have not the permission to create a review.")
         return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     
     movie = get_object_or_404(Movie, pk=movie_pk)
@@ -416,6 +425,7 @@ def create_review(request, movie_pk):
             review.profile = request.user.profile
             review.movie = movie
             review.save()
+            messages.success(request, "Review created successfully.")
             return redirect(reverse('core:profile_review_list', kwargs={'pk': request.user.profile.pk}))
     else:
         form = ReviewForm()
@@ -431,7 +441,6 @@ class ReviewDeleteView(LogDeleteView):
         return context
 
     def get_success_url(self):
-        # TODO add a temporary banner that confirms the action
         return reverse('core:profile_review_list', kwargs={'pk': self.get_object().profile.pk})
     
     

@@ -108,6 +108,18 @@
         </div>
     </nav>
 
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="alert alert-success" style="text-align: center;" role="alert">
+            {% elif message.tags == 'error' %}
+                <div class="alert alert-danger" style="text-align: center;" role="alert">
+            {% endif %}
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
     {% block content %} {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
