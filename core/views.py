@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import JsonResponse
 from django.contrib.auth.models import Group, User
+from .recommendation import get_recommended_movies
 import random
 
 def home_view(request):
@@ -43,7 +44,13 @@ def home_view(request):
         except Profile.DoesNotExist:
             context['friends_movies'] = None
             
-    #TODO insert recommended movies
+    if request.user.is_authenticated:
+        try:
+            user_profile = Profile.objects.get(user=request.user)
+            context['recommended_movies'] = get_recommended_movies(user_profile)
+        except Profile.DoesNotExist:
+            context['recommended_movies'] = None
+            
     
     return render(request, template_name='home.html', context=context)
 
