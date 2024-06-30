@@ -3,7 +3,7 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from os.path import join
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 
 # checks on the creation of new profiles and their update
 @receiver(post_save, sender=get_user_model())
@@ -15,8 +15,8 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         try:
             profile = Profile.objects.get(user=instance)
             profile.delete()
-            base_group.user_set.delete(instance)
-            business_group.user_set.delete(instance)
+            base_group.user_set.remove(instance)
+            business_group.user_set.remove(instance)
             return
         except Profile.DoesNotExist:
             return

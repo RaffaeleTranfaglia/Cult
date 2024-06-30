@@ -331,12 +331,14 @@ def toggle_favourite(request, movie_pk):
 def add_log(request, movie_pk):
     if not in_group(request.user, 'base') and not in_group(request.user, 'business'):
         #TODO add a denial message
+        messages.error(request, "You do not have permission to add a log for this movie.")
         return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     
     movie = Movie.objects.get(pk=movie_pk)
     
     if movie.release_date > timezone.now().date():
         #TODO add a denial message
+        messages.error(request, "You cannot log a movie that hasn't been released yet.")
         return redirect(reverse('core:movie_page', kwargs={'pk': movie_pk}))
     
     if request.method == 'POST':
