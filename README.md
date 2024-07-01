@@ -48,7 +48,7 @@ The following UML diagram shows the platform's database structure.
 
 Observations:
 - The database adopted is SQLite.
-- Since Django framework does not support composite primary keys, each model has a non-composite primary key. In case location uniquness for multiple attributes is needed, a UniqueConstraint object is defined.
+- Since Django framework does not support composite primary keys, each model has a non-composite primary key. In case location uniqueness for multiple attributes is needed, a UniqueConstraint object is defined.
 - Synchronization of database accesses is guaranteed by Django.
 
 ## Recommendation System
