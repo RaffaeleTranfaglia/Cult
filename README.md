@@ -42,6 +42,10 @@ Whenever a new user is registered, the system create a related profile. Each new
 Staff and admin users do not have a related profile, this is because they are users whose purpose is to ensure the proper functioning of the platform. They do not appear in profile searches and cannot be followed.
 
 ## Database
+The following UML diagram shows the platform's database structure.
+
+![cult_uml_diagram](/docs/cult_uml_diagram.png)
+
 ## Features
 ## Recommendation System
 ## Installation
