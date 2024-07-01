@@ -85,7 +85,7 @@ $$\text{where 0 <= i < len(FEATURES) is the i-th feature.}$$
 
 Eventually, the system computes the cosine similarity between the profile vector and each movie vector that has not been logged or watchlisted by the profile. The result is ordered by similarity in descending order.
 $$\mathrm{\text{cosine similarity of A and B}\to cos(\theta)} = \dfrac{AB}{\lVert A \rVert \lVert B \rVert}$$
-$$\text{where } cos(\theta)=[0,1] \text{ because the vector elements cannot assume negative valuse.}$$
+$$\text{where } cos(\theta)=[0,1] \text{ because the vector elements cannot assume negative values.}$$
 
 ## Installation
 ## Testing
