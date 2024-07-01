@@ -2,7 +2,7 @@
 A webapp based on the paradigms that compose modern social networks and focussed on the cinematic art.
 
 ## Description
-The website provides for the managment of a collection of movies and user profiles.  
+The website provides for the management of a collection of movies and user profiles.  
 Users can be anonymous or registered. Registered users are contained in one of the following categories:
 "base", "business", "staff", "admin". Each category defines a set of permissions applied to the users in the group.
 
