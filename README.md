@@ -132,7 +132,7 @@ Eventually, open on a browser the following url, `http://127.0.0.1:8000/` (local
 There are test-cases to verify the correct execution of certain segments of the software.  
 
 The test-cases cover the following aspects:
-- Check that when a user is registered, it is added to "base" group adn an associated profile is create. In case the user created is an admin or a staff user, this should not happen.
+- Check that when a user is registered, it is added to "base" group and an associated profile is created. In case the user created is an admin or a staff user, this should not happen.
 - Check that the view handling the logic for logging a movie executes correctly in every case, and that block users that does not have the right permissions or that are trying to log a movie that has not yet been released.
 
 To run test-cases:
