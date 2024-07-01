@@ -52,5 +52,40 @@ Observations:
 - Synchronization of database accesses is guaranteed by Django.
 
 ## Recommendation System
+The recommendation system adopted is content-based. Although the system has been designed around the movie concept, it would be valid for any kind of discrete item.
+
+Each movie is translated into a vector. Every element in the vector corresponds to a feature and its value (0,1) represents whether of not the item has that feature.  
+In this case, the features are the set of genres:
+```
+FEATURES = [
+    'War',
+    'Comedy',
+    'Documentary',
+    'Crime',
+    'Thriller',
+    'Noir',
+    'Science Fiction',
+    'Action',
+    'Adventure',
+    'Animation',
+    'Family',
+    'Horror',
+    'Western',
+    'Romance',
+    'Musical',
+    'Mystery',
+    'Drama',
+    'Fantasy'
+    ]
+```
+
+The profile vector is defined as follows: every logged and liked movie of the profile is vectorized, the average resulting vector represents the profile cinematic taste.
+$$\mathrm{\text{profile-vector}[i]} = \sum_{n=0}^{\text{number of liked movies}-1} \dfrac{\text{movie-vector n}[i]}{\text{number of liked movies}}$$
+$$\text{where 0 <= i < len(FEATURES) is the i-th feature.}$$
+
+Eventually, the system computes the cosine similarity between the profile vector and each movie vector that has not been logged or watchlisted by the profile. The result is ordered by similarity in descending order.
+$$\mathrm{\text{cosine similarity of A and B}\to cos(\theta)} = \dfrac{AB}{\lVert A \rVert \lVert B \rVert}$$
+$$\text{where } cos(\theta)=[0,1] \text{ because the vector elements cannot assume negative valuse.}$$
+
 ## Installation
 ## Testing
