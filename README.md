@@ -88,4 +88,44 @@ $$\mathrm{\text{cosine similarity of A and B}\to cos(\theta)} = \dfrac{AB}{\lVer
 $$\text{where } cos(\theta)=[0,1] \text{ because the vector elements cannot assume negative values.}$$
 
 ## Installation
+To install the webapp, the latest release contains an already populated database for test purposes. It can be downloaded to test the features.
+
+Otherwise, clone the repo:
+```
+git clone https://github.com/RaffaeleTranfaglia/Cult.git
+```
+
+Make sure `pipenv` is installed.  
+Install dependencies:
+```
+pipenv install --anyway
+```
+
+Activate the virtual environment:
+```
+pipenv shell
+```
+
+Create migrations:
+```
+python manage.py makemigrations core
+```
+
+Migrate:
+```
+python manage.py migrate
+```
+
+Create the admin (superuser):
+```
+python manage.py createsuperuser
+```
+
+Start development server to run the webapp:
+```
+python manage.py runserver
+```
+
+Eventually, open on a browser the following url, `http://127.0.0.1:8000/` (local host IP address: 127.0.0.1, port: 8000).
+
 ## Testing
